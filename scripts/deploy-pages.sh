@@ -25,6 +25,7 @@ cp "$BASE_DIR/web/index.html" \
    "$BASE_DIR/web/app.js" \
    "$BASE_DIR/web/i18n.js" \
    "$BASE_DIR/web/style.css" \
+   "$BASE_DIR/web/favicon.svg" \
    "$DEPLOY_DIR/"
 
 # Copy output (manifest + bundles for editor, fragments for individual access)

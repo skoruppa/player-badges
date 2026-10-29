@@ -191,7 +191,7 @@ const server = http.createServer((req, res) => {
   }
 
   // Static: web files at root (index.html, app.js, style.css, i18n.js)
-  const webFiles = ['index.html', 'app.js', 'style.css', 'i18n.js'];
+  const webFiles = ['index.html', 'app.js', 'style.css', 'i18n.js', 'favicon.svg'];
   const basename = pathname.substring(1); // strip leading /
   if (webFiles.includes(basename)) {
     serveStatic(res, 'web/' + basename);
