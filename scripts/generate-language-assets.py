@@ -66,18 +66,18 @@ APP_LOCALES = {
 }
 
 AUDIO_LANGS = [
-    "en", "pl", "es", "fr", "de", "it", "pt", "ru", "ja", "ko", "zh", "hi",
+    "en", "pl", "es", "fr", "de", "it", "pt", "pt_BR", "ru", "ja", "ko", "zh", "hi",
     "ar", "tr", "nl", "sv", "no", "da", "fi", "cs", "hu", "ro", "uk", "el",
     "he", "th", "vi", "id", "ms", "hr", "sr", "bg", "sk", "sl",
 ]
 
 AUDIO_TO_ISO3 = {
     "en": "eng", "pl": "pol", "es": "spa", "fr": "fra", "de": "deu", "it": "ita",
-    "pt": "por", "ru": "rus", "ja": "jpn", "ko": "kor", "zh": "zho", "hi": "hin",
-    "ar": "ara", "tr": "tur", "nl": "nld", "sv": "swe", "no": "nor", "da": "dan",
-    "fi": "fin", "cs": "ces", "hu": "hun", "ro": "ron", "uk": "ukr", "el": "ell",
-    "he": "heb", "th": "tha", "vi": "vie", "id": "ind", "ms": "msa", "hr": "hrv",
-    "sr": "srp", "bg": "bul", "sk": "slk", "sl": "slv",
+    "pt": "por", "pt_BR": "por-br", "ru": "rus", "ja": "jpn", "ko": "kor", "zh": "zho",
+    "hi": "hin", "ar": "ara", "tr": "tur", "nl": "nld", "sv": "swe", "no": "nor",
+    "da": "dan", "fi": "fin", "cs": "ces", "hu": "hun", "ro": "ron", "uk": "ukr",
+    "el": "ell", "he": "heb", "th": "tha", "vi": "vie", "id": "ind", "ms": "msa",
+    "hr": "hrv", "sr": "srp", "bg": "bul", "sk": "slk", "sl": "slv",
 }
 
 
@@ -193,12 +193,25 @@ LABEL_OVERRIDES = {
     },
 }
 
+# Short label overrides for Brazilian Portuguese (Babel gives long "Portuguese (Brazil)")
+PT_BR_LABELS = {
+    "en": "Pt-BR", "pl": "Pt-BR", "de": "Pt-BR", "es": "Pt-BR", "fr": "Pt-BR",
+    "it": "Pt-BR", "pt": "Brasileiro", "pt_BR": "Brasileiro", "ru": "Pt-BR",
+    "tr": "Pt-BR", "nl": "Pt-BR", "hu": "Pt-BR", "cs": "Pt-BR", "hr": "Pt-BR",
+    "ro": "Pt-BR", "sk": "Pt-BR", "vi": "Pt-BR", "id": "Pt-BR", "bg": "Pt-BR",
+    "ja": "Pt-BR", "ar": "Pt-BR", "el": "Pt-BR", "he": "Pt-BR", "bn": "Pt-BR",
+    "ur": "Pt-BR", "nb": "Pt-BR", "sv": "Pt-BR", "da": "Pt-BR", "fi": "Pt-BR",
+}
+
 
 def _get_label(audio_lang, app_locale):
     # Check manual overrides first
     for locale_key, overrides in LABEL_OVERRIDES.items():
         if app_locale == locale_key and audio_lang in overrides:
             return overrides[audio_lang]
+    # Short labels for Brazilian Portuguese
+    if audio_lang == "pt_BR" and app_locale in PT_BR_LABELS:
+        return PT_BR_LABELS[app_locale]
     try:
         audio_loc = Locale.parse(audio_lang)
         app_loc = Locale.parse(app_locale)

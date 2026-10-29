@@ -32,7 +32,7 @@ from badge_vec import STATIC_BADGES, vectorize_badge
 # Language badges: ID → ISO 639-3 code
 LANG_BADGES = {
     "p-eng": "eng", "p-pol": "pol", "p-spa": "spa", "p-fre": "fra",
-    "p-ger": "deu", "p-ita": "ita", "p-por": "por", "p-rus": "rus",
+    "p-ger": "deu", "p-ita": "ita", "p-por": "por", "p-por-br": "por-br", "p-rus": "rus",
     "p-jpn": "jpn", "p-kor": "kor", "p-zho": "zho", "p-hin": "hin",
     "p-ara": "ara", "p-tur": "tur", "p-dut": "nld", "p-swe": "swe",
     "p-nor": "nor", "p-dan": "dan", "p-fin": "fin", "p-ces": "ces",

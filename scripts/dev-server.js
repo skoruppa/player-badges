@@ -52,7 +52,7 @@ const GROUP_FILTERS = {
 };
 
 const SOURCE_LANG_FILTERS = [
-  "s-eng", "s-pol", "s-spa", "s-fre", "s-ger", "s-ita", "s-por", "s-rus",
+  "s-eng", "s-pol", "s-spa", "s-fre", "s-ger", "s-ita", "s-por", "s-por-br", "s-rus",
   "s-jpn", "s-kor", "s-zho", "s-hin", "s-ara", "s-tur", "s-dut", "s-swe",
   "s-nor", "s-dan", "s-fin", "s-ces", "s-hun", "s-ron", "s-ukr", "s-ell",
   "s-heb", "s-tha", "s-vie", "s-ind", "s-msa", "s-hrv", "s-srp", "s-bul",
