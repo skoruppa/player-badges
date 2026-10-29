@@ -253,19 +253,24 @@ function buildSidebar() {
     header.appendChild(moveUp);
     header.appendChild(moveDown);
 
-    const toggleBtn = document.createElement('span');
-    toggleBtn.className = 'group-toggle-btn';
-    toggleBtn.textContent = translations.toggle;
-    toggleBtn.addEventListener('click', event => {
+    const toggleBtn = document.createElement('label');
+    toggleBtn.className = 'group-toggle';
+    const toggleInput = document.createElement('input');
+    toggleInput.type = 'checkbox';
+    toggleInput.checked = badgeIds.every(id => selectedBadges.has(id));
+    toggleInput.addEventListener('change', event => {
       event.stopPropagation();
-      const allSelected = badgeIds.every(id => selectedBadges.has(id));
       badgeIds.forEach(id => {
-        if (allSelected) selectedBadges.delete(id);
-        else selectedBadges.add(id);
+        if (toggleInput.checked) selectedBadges.add(id);
+        else selectedBadges.delete(id);
       });
       buildSidebar();
       updatePreview();
     });
+    const toggleSlider = document.createElement('span');
+    toggleSlider.className = 'toggle-slider';
+    toggleBtn.appendChild(toggleInput);
+    toggleBtn.appendChild(toggleSlider);
     header.appendChild(toggleBtn);
     section.appendChild(header);
 
@@ -407,8 +412,13 @@ function updatePreview() {
     params += `&c=${context}`;
   }
 
-  // Always use g= with active groups
-  params += `&g=${activeGroupIds.join(',')}`;
+  // g= only when not all groups selected (omit = all groups)
+  const allGroupIds = manifest.groups.map(g => g.id);
+  const isAllGroups = activeGroupIds.length === allGroupIds.length &&
+    allGroupIds.every(gid => activeGroupIds.includes(gid));
+  if (!isAllGroups) {
+    params += `&g=${activeGroupIds.join(',')}`;
+  }
 
   // x= excluded badges (only IDs deselected from active groups)
   const excluded = [];

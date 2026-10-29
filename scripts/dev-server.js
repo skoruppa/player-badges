@@ -66,7 +66,7 @@ const ALL_LANG_IDS = new Set([...GROUP_FILTERS.lang, ...SOURCE_LANG_FILTERS]);
 function handleBadgeApi(query) {
   const locale = query.l || 'en';
   const context = query.c || 'player';
-  const groupsParam = query.g || 'res,hdr,aud,ch,lang';
+  const groupsParam = query.g || 'res,hdr,aud,ch,src,spc,lang';
   const excludeParam = query.x || '';
   const groupOrderParam = query.go || '';
   const style = query.s || 'filled';

@@ -82,7 +82,7 @@ export default {
     // Parse params
     const locale = url.searchParams.get("l") || "en";
     const context = url.searchParams.get("c") || "player";
-    const groupsParam = url.searchParams.get("g") || "res,hdr,aud,ch,lang";
+    const groupsParam = url.searchParams.get("g") || "res,hdr,aud,ch,src,spc,lang";
     const excludeParam = url.searchParams.get("x");
     const groupOrderParam = url.searchParams.get("go");
     const style = url.searchParams.get("s") || "filled";
