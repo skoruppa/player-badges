@@ -69,3 +69,11 @@ wrangler deploy
 
 echo ""
 echo "✅ Worker deployed: https://nuvio-badges.skoruppa.workers.dev"
+
+# ── Purge edge cache ───────────────────────────────────────────────────────
+
+echo ""
+echo "🧹 Purging edge cache..."
+sleep 5
+PURGE_KEY="okgzTIYITKurqdWQcGiH58SGpdGm1HXp-39Kr4tcPWE"
+curl -s -X POST "https://nuvio-badges.skoruppa.workers.dev/v1/purge?key=$PURGE_KEY" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'  ✓ {d}')" 2>/dev/null || echo "  ⚠ purge failed (try manually)"
