@@ -14,6 +14,31 @@ let currentStyle = DEFAULT_STYLE;
 let fillColor = '#000000';
 let noBorder = false;
 
+// ── Persistence ────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = 'nuvio-badge-editor';
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      locale: document.getElementById('locale-select')?.value,
+      context: document.getElementById('context-select')?.value,
+      style: currentStyle,
+      fillColor,
+      noBorder,
+      selectedBadges: [...selectedBadges],
+      groupOrder,
+    }));
+  } catch {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
 // ── i18n ───────────────────────────────────────────────────────────────────
 
 function detectBrowserLocale() {
@@ -62,12 +87,34 @@ async function init() {
   });
 
   // Set default locale based on browser
-  const defaultLocale = manifest.availableLocales.includes(uiLang) ? uiLang : 'en';
+  const saved = loadState();
+  const defaultLocale = saved?.locale
+    || (manifest.availableLocales.includes(uiLang) ? uiLang : 'en');
   localeSelect.value = defaultLocale;
   localeSelect.addEventListener('change', () => loadBadges());
 
   // Context selector
-  document.getElementById('context-select').addEventListener('change', () => loadBadges());
+  const contextSelect = document.getElementById('context-select');
+  if (saved?.context) contextSelect.value = saved.context;
+  contextSelect.addEventListener('change', () => loadBadges());
+
+  // Restore style
+  if (saved?.style) {
+    currentStyle = saved.style;
+    document.querySelectorAll('#style-pills .pill').forEach(p =>
+      p.classList.toggle('active', p.dataset.value === currentStyle)
+    );
+    document.getElementById('filled-options').classList.toggle('visible', currentStyle === 'filled');
+  }
+  if (saved?.fillColor) {
+    fillColor = saved.fillColor;
+    document.getElementById('fill-color-picker').value = fillColor;
+    document.getElementById('fill-color-hex').value = fillColor;
+  }
+  if (saved?.noBorder) {
+    noBorder = true;
+    document.getElementById('no-border-checkbox').checked = true;
+  }
 
   // Style pills
   document.querySelectorAll('#style-pills .pill').forEach(pill => {
@@ -131,12 +178,22 @@ async function init() {
 async function loadBadges() {
   const locale = document.getElementById('locale-select').value;
   const context = document.getElementById('context-select').value;
+  const saved = loadState();
+  const previousSelected = new Set(selectedBadges);
   fragments = {};
   selectedBadges.clear();
   groupOrder = manifest.groups.map(g => g.id);
   badgeOrder = {};
 
-  // Load all fragments in one request (bundle = static + lang for this locale/context)
+  // Restore group order if saved
+  if (saved?.groupOrder) {
+    const savedSet = new Set(saved.groupOrder);
+    const validOrder = saved.groupOrder.filter(gid => manifest.groups.some(g => g.id === gid));
+    const missing = groupOrder.filter(gid => !savedSet.has(gid));
+    groupOrder = [...validOrder, ...missing];
+  }
+
+  // Load all fragments in one request
   try {
     const bundle = await fetch(`/output/bundles/${context}-${locale}.json`).then(r => r.json());
     for (const [id, fragment] of Object.entries(bundle)) {
@@ -152,6 +209,35 @@ async function loadBadges() {
     } catch {}
   }
 
+  // Build deselected set from previous state or saved state.
+  // Static badges (res, hdr, etc.) share IDs across contexts.
+  // Language badges have separate p-*/s-* IDs — map between them.
+  let deselectedIds = new Set();
+  const referenceSelected = previousSelected.size > 0
+    ? previousSelected
+    : (saved?.selectedBadges ? new Set(saved.selectedBadges) : null);
+
+  if (referenceSelected) {
+    // Collect all filter IDs that could have been visible in previous state
+    const prevContext = saved?.context || 'player';
+    const allPrevIds = new Set();
+    for (const f of manifest.filters) {
+      if (f.context === 'player' && prevContext !== 'player') continue;
+      if (f.context === 'source' && prevContext !== 'source') continue;
+      allPrevIds.add(f.id);
+    }
+
+    for (const id of allPrevIds) {
+      if (!referenceSelected.has(id)) {
+        deselectedIds.add(id);
+        // Map language badge IDs across contexts (p-eng ↔ s-eng)
+        const base = id.substring(2); // strip p- or s-
+        if (id.startsWith('p-')) deselectedIds.add('s-' + base);
+        if (id.startsWith('s-')) deselectedIds.add('p-' + base);
+      }
+    }
+  }
+
   for (const group of manifest.groups) {
     const groupFilters = manifest.filters.filter(f => {
       if (f.groupId !== group.id) return false;
@@ -162,9 +248,9 @@ async function loadBadges() {
     badgeOrder[group.id] = groupFilters.map(f => f.id);
 
     for (const filter of groupFilters) {
-      if (fragments[filter.id]) {
-        selectedBadges.add(filter.id);
-      }
+      if (!fragments[filter.id]) continue;
+      if (deselectedIds.has(filter.id)) continue;
+      selectedBadges.add(filter.id);
     }
   }
 
@@ -257,7 +343,7 @@ function buildSidebar() {
     toggleBtn.className = 'group-toggle';
     const toggleInput = document.createElement('input');
     toggleInput.type = 'checkbox';
-    toggleInput.checked = badgeIds.every(id => selectedBadges.has(id));
+    toggleInput.checked = badgeIds.some(id => selectedBadges.has(id));
     toggleInput.addEventListener('change', event => {
       event.stopPropagation();
       const badgeEls = section.querySelectorAll('.badge-item');
@@ -467,6 +553,8 @@ function updatePreview() {
   }
 
   document.getElementById('url-output').value = `${location.origin}/v1/badge.json?${params}`;
+
+  saveState();
 }
 
 // ── Clipboard ──────────────────────────────────────────────────────────────
