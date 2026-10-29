@@ -14,6 +14,10 @@ let currentStyle = DEFAULT_STYLE;
 let fillColor = '#000000';
 let noBorder = false;
 
+function getContext() {
+  return document.querySelector('#context-cards .context-card.active')?.dataset.value || 'player';
+}
+
 // ── Persistence ────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = 'nuvio-badge-editor';
@@ -22,7 +26,7 @@ function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       locale: document.getElementById('locale-select')?.value,
-      context: document.getElementById('context-select')?.value,
+      context: getContext(),
       style: currentStyle,
       fillColor,
       noBorder,
@@ -93,10 +97,20 @@ async function init() {
   localeSelect.value = defaultLocale;
   localeSelect.addEventListener('change', () => loadBadges());
 
-  // Context selector
-  const contextSelect = document.getElementById('context-select');
-  if (saved?.context) contextSelect.value = saved.context;
-  contextSelect.addEventListener('change', () => loadBadges());
+  // Context cards
+  document.querySelectorAll('#context-cards .context-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('#context-cards .context-card').forEach(c =>
+        c.classList.toggle('active', c === card)
+      );
+      loadBadges();
+    });
+  });
+  if (saved?.context) {
+    document.querySelectorAll('#context-cards .context-card').forEach(c =>
+      c.classList.toggle('active', c.dataset.value === saved.context)
+    );
+  }
 
   // Restore style
   if (saved?.style) {
@@ -177,7 +191,7 @@ async function init() {
 
 async function loadBadges() {
   const locale = document.getElementById('locale-select').value;
-  const context = document.getElementById('context-select').value;
+  const context = getContext();
   const saved = loadState();
   const previousSelected = new Set(selectedBadges);
   fragments = {};
@@ -491,7 +505,7 @@ function updatePreview() {
 
   // Build URL — scheme: g= (groups) + x= (exclusions) + go= (group order)
   const locale = document.getElementById('locale-select').value;
-  const context = document.getElementById('context-select').value;
+  const context = getContext();
   const activeGroupIds = groupOrder.filter(gid =>
     (badgeOrder[gid] || []).some(id => fragments[id] && selectedBadges.has(id))
   );
