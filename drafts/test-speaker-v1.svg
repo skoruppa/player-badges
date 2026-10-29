@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="15" height="13" viewBox="0 0 15 13">
+  <!-- Classic speaker icon: box + cone + two sound wave arcs -->
+  <!-- Speaker body: small rectangle + trapezoid cone -->
+  <path d="M0.5,4.5 L0.5,8.5 L2.5,8.5 L5.5,11.5 L5.5,1.5 L2.5,4.5 Z" fill="white"/>
+  <!-- Inner wave -->
+  <path d="M8.5,4 A3,3 0 0 1 8.5,9" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- Outer wave -->
+  <path d="M11,2 A5.5,5.5 0 0 1 11,11" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+</svg>

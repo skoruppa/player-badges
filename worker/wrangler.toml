@@ -1,0 +1,7 @@
+name = "nuvio-badges"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "BADGE_FRAGMENTS"
+id = "8efe629c3733453cb2fd2aa8782a3888"

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="15" height="11" viewBox="0 0 15 11">
+  <!-- DolbyDoubleDIcon - exact from Kotlin diff code -->
+  <!-- Left D: straight left edge, bulging curve right -->
+  <path d="M0,0 L2.9,0 A4.0,5.5 0 0 1 2.9,11 L0,11 Z" fill="white"/>
+  <!-- Right D: mirrored - bulging curve left, straight right edge -->
+  <path d="M15,0 L12.1,0 A4.0,5.5 0 0 0 12.1,11 L15,11 Z" fill="white"/>
+</svg>

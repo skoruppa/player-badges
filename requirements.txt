@@ -1,0 +1,2 @@
+freetype-py>=2.4.0
+babel>=2.14.0

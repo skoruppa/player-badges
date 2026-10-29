@@ -1,0 +1,12 @@
+{
+  "id": "s-fin",
+  "groupId": "lang",
+  "name": "Finnish",
+  "pattern": "(?i)\\bfinnish\\b|\\bfin\\b|\\bfi\\b",
+  "imageURL": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDIyIDE0Ij4KICA8cGF0aCBkPSJNNC42NiwxMC41MCBMNC42Niw0LjA5IEw4LjcyLDQuMDkgTDguNzIsNS4wMCBMNS43Nyw1LjAwIEw1Ljc3LDYuOTEgTDguMzQsNi45MSBMOC4zNCw3Ljc4IEw1Ljc3LDcuNzggTDUuNzcsMTAuNTAgTDQuNjYsMTAuNTAgWiBNMTAuNzgsNC4wOSBMMTAuNzgsMTAuNTAgTDkuNjcsMTAuNTAgTDkuNjcsNC4wOSBMMTAuNzgsNC4wOSBaIE0xNy4yMyw0LjA5IEwxNy4yMywxMC41MCBMMTYuMTIsMTAuNTAgTDEzLjI3LDUuOTUgTDEzLjI3LDEwLjUwIEwxMi4xNiwxMC41MCBMMTIuMTYsNC4wOSBMMTMuMjcsNC4wOSBMMTYuMTIsOC42NiBMMTYuMTIsNC4wOSBMMTcuMjMsNC4wOSBaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
+  "isEnabled": true,
+  "tagColor": "#00000000",
+  "tagStyle": "filled",
+  "textColor": "#FFFFFF",
+  "borderColor": "#FFFFFFFF"
+}

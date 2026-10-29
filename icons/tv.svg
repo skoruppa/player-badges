@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10">
+  <!-- TV icon for HDTV -->
+  <rect x="0.8" y="1" width="8.4" height="6" rx="0.8" fill="none" stroke="white" stroke-width="0.9"/>
+  <line x1="3.5" y1="8.5" x2="6.5" y2="8.5" stroke="white" stroke-width="0.9" stroke-linecap="round"/>
+  <line x1="5" y1="7" x2="5" y2="8.5" stroke="white" stroke-width="0.9" stroke-linecap="round"/>
+</svg>

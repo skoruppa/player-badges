@@ -1,0 +1,12 @@
+{
+  "id": "s-hin",
+  "groupId": "lang",
+  "name": "Hindi",
+  "pattern": "(?i)\\bhindi\\b|\\bhin\\b|\\bhi\\b|[\\u0900-\\u097F]{3,}",
+  "imageURL": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDE0Ij4KICA8cGF0aCBkPSJNOC42MiwxMC41MCBMOC42Miw3LjY2IEw1Ljc3LDcuNjYgTDUuNzcsMTAuNTAgTDQuNjYsMTAuNTAgTDQuNjYsNC4wOSBMNS43Nyw0LjA5IEw1Ljc3LDYuNzcgTDguNjIsNi43NyBMOC42Miw0LjA5IEw5LjczLDQuMDkgTDkuNzMsMTAuNTAgTDguNjIsMTAuNTAgWiBNMTIuMjMsNC4wOSBMMTIuMjMsMTAuNTAgTDExLjEyLDEwLjUwIEwxMS4xMiw0LjA5IEwxMi4yMyw0LjA5IFogTTE4LjY5LDQuMDkgTDE4LjY5LDEwLjUwIEwxNy41OCwxMC41MCBMMTQuNzIsNS45NSBMMTQuNzIsMTAuNTAgTDEzLjYxLDEwLjUwIEwxMy42MSw0LjA5IEwxNC43Miw0LjA5IEwxNy41OCw4LjY2IEwxNy41OCw0LjA5IEwxOC42OSw0LjA5IFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=",
+  "isEnabled": true,
+  "tagColor": "#00000000",
+  "tagStyle": "filled",
+  "textColor": "#FFFFFF",
+  "borderColor": "#FFFFFFFF"
+}

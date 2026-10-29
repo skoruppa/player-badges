@@ -1,0 +1,12 @@
+{
+  "id": "p-4k",
+  "groupId": "res",
+  "name": "4K",
+  "pattern": "(?i)\\b(2160p|4k)\\b",
+  "imageURL": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDE4IDE0Ij4KICA8cGF0aCBkPSJNNC4yMyw4LjQyIEw3LjAwLDQuMDkgTDguMDksNC4wOSBMOC4wOSw4LjIyIEw4Ljg5LDguMjIgTDguODksOS4wOCBMOC4wOSw5LjA4IEw4LjA5LDEwLjUwIEw3LjAzLDEwLjUwIEw3LjAzLDkuMDggTDQuMjcsOS4wOCBMNC4yMyw4LjQyIFogTTUuMzQsOC4yMiBMNy4wMyw4LjIyIEw3LjAzLDUuNTYgTDYuOTUsNS42OSBMNS4zNCw4LjIyIFogTTEzLjUyLDEwLjUwIEwxMS41OSw3LjczIEwxMC44OCw4LjUwIEwxMC44OCwxMC41MCBMOS43NywxMC41MCBMOS43Nyw0LjA5IEwxMC44OCw0LjA5IEwxMC44OCw3LjExIEwxMS40OCw2LjM0IEwxMy4zNiw0LjA5IEwxNC43MCw0LjA5IEwxMi4zMyw2Ljk0IEwxNC44NCwxMC41MCBMMTMuNTIsMTAuNTAgWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==",
+  "isEnabled": true,
+  "tagColor": "#00000000",
+  "tagStyle": "filled",
+  "textColor": "#FFFFFF",
+  "borderColor": "#FFFFFFFF"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "s-ita",
+  "groupId": "lang",
+  "name": "Italian",
+  "pattern": "(?i)\\bitalian\\b|\\bita\\b|\\bit\\b",
+  "imageURL": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDIyIDE0Ij4KICA8cGF0aCBkPSJNNS44Myw0LjA5IEw1LjgzLDEwLjUwIEw0LjcyLDEwLjUwIEw0LjcyLDQuMDkgTDUuODMsNC4wOSBaIE02Ljc1LDUuMDAgTDYuNzUsNC4wOSBMMTEuODMsNC4wOSBMMTEuODMsNS4wMCBMOS44Myw1LjAwIEw5LjgzLDEwLjUwIEw4LjcyLDEwLjUwIEw4LjcyLDUuMDAgTDYuNzUsNS4wMCBaIE0xMi4wOSwxMC41MCBMMTQuNTIsNC4wOSBMMTUuNTIsNC4wOSBMMTcuOTQsMTAuNTAgTDE2Ljc4LDEwLjUwIEwxNi4yNSw5LjAwIEwxMy43OCw5LjAwIEwxMy4yNSwxMC41MCBMMTIuMDksMTAuNTAgWiBNMTQuMDgsOC4xMSBMMTUuOTQsOC4xMSBMMTUuMDIsNS40NSBMMTQuMDgsOC4xMSBaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
+  "isEnabled": true,
+  "tagColor": "#00000000",
+  "tagStyle": "filled",
+  "textColor": "#FFFFFF",
+  "borderColor": "#FFFFFFFF"
+}

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="489.215"
+   height="94.440002"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="IMAX.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.30900566"
+     inkscape:cx="-35.598053"
+     inkscape:cy="-794.48382"
+     inkscape:window-width="1859"
+     inkscape:window-height="1131"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g3" />
+  <title
+     id="title1">IMAX logo (black)</title>
+  <g
+     transform="matrix(0.5,0,0,0.5,0,-0.2865)"
+     fill-rule="evenodd"
+     style="fill:#000000"
+     id="g3">
+    <polygon
+       points="408.06,189.45 408.06,0.573 311.94,0.573 254.98,113.51 197.48,0.723 101.79,1.021 101.65,189.45 154.9,189.45 154.97,52.836 165.65,52.836 232.45,189.29 277.01,189.29 343.84,52.836 354.71,52.836 354.7,189.45 "
+       id="polygon1" />
+    <polygon
+       points="0,189.44 59.759,189.44 59.759,0.573 0,0.573 "
+       id="polygon2" />
+    <path
+       d="m 514.56,0.573 -95.994,188.88 h 63.844 l 16.703,-32.123 h 119.29 l 16.273,32.123 h 63.998 L 602.628,0.573 h -88.069 z m 47.089,42.935 h -5.876 l -36.339,71.533 h 78.149 z"
+       id="path2" />
+    <polygon
+       points="889.55,89.133 963.98,0.573 891.13,0.573 839.64,61.938 789.63,0.573 715.46,0.573 790.32,89.218 700.93,189.45 779.99,189.45 840.14,121.2 899.62,189.45 978.43,189.45 "
+       id="polygon3" />
+  </g>
+  <metadata
+     id="metadata3">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>IMAX logo (black)</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="14" viewBox="0 0 40 14">
+  <g transform="translate(4, 2)">
+    <rect x="1" y="3" width="8" height="5.5" rx="0.8" fill="none" stroke="white" stroke-width="0.9"/>
+    <circle cx="5" cy="5.8" r="1.5" fill="none" stroke="white" stroke-width="0.8"/>
+    <rect x="3.5" y="1.8" width="3" height="1.5" rx="0.5" fill="none" stroke="white" stroke-width="0.7"/>
+  </g>
+  <text x="17" y="10.5" fill="white" font-family="Roboto, sans-serif" font-size="9" font-weight="500">CAM</text>
+</svg>

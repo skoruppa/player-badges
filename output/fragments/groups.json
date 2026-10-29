@@ -1,0 +1,37 @@
+[
+  {
+    "id": "res",
+    "name": "Resolution",
+    "isExpanded": true
+  },
+  {
+    "id": "hdr",
+    "name": "HDR / Vision",
+    "isExpanded": true
+  },
+  {
+    "id": "aud",
+    "name": "Audio Format",
+    "isExpanded": true
+  },
+  {
+    "id": "ch",
+    "name": "Channels",
+    "isExpanded": true
+  },
+  {
+    "id": "src",
+    "name": "Source",
+    "isExpanded": true
+  },
+  {
+    "id": "spc",
+    "name": "Special",
+    "isExpanded": true
+  },
+  {
+    "id": "lang",
+    "name": "Language",
+    "isExpanded": true
+  }
+]

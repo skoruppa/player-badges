@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuvio Badge Editor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1 id="t-title">Nuvio Badge Editor</h1>
+      <p id="t-sub">Drag groups and badges to reorder</p>
+    </div>
+
+    <div class="control-section">
+      <h3 id="t-settings">Settings</h3>
+      <div class="control-row">
+        <label id="t-context">Context</label>
+        <select id="context-select">
+          <option value="player" selected>Player</option>
+          <option value="source">Source</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <label id="t-locale">Locale</label>
+        <select id="locale-select"></select>
+      </div>
+    </div>
+
+    <div class="control-section">
+      <h3 id="t-style">Style</h3>
+      <div class="style-pills" id="style-pills">
+        <div class="pill active" data-value="bordered" id="pill-bordered">Bordered</div>
+        <div class="pill" data-value="filled" id="pill-filled">Filled</div>
+        <div class="pill" data-value="none" id="pill-none">None</div>
+      </div>
+      <div class="filled-options" id="filled-options">
+        <div class="control-row">
+          <label id="t-fill">Fill color</label>
+          <input type="color" id="fill-color-picker" value="#000000">
+          <input class="hex-input" id="fill-color-hex" value="#000000">
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="no-border-checkbox">
+          <span id="t-noborder">No border</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="groups-container" id="groups-container"></div>
+  </div>
+
+  <!-- Right column (preview + output, sticky on desktop) -->
+  <div class="right-column">
+    <!-- Preview -->
+    <div class="preview-panel" id="preview-panel">
+      <div class="preview-toggle" id="preview-toggle">
+        <div class="preview-label" id="t-preview">Live Preview</div>
+        <span class="preview-chevron">&#9660;</span>
+      </div>
+      <div class="preview-label desktop-only" id="t-preview-desktop">Live Preview</div>
+      <div class="preview-row" id="preview">
+        <span class="preview-empty" id="t-empty">Select badges to preview</span>
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div class="output-panel">
+      <div class="output-section">
+        <h2 id="t-url">Badge URL</h2>
+        <div class="url-row">
+          <input class="url-input" id="url-output" readonly>
+          <button class="btn" id="btn-copy-url">Copy URL</button>
+        </div>
+      </div>
+      <div class="output-section">
+        <h2>JSON</h2>
+        <div class="btn-row">
+          <button class="btn btn-small" id="btn-copy-json">Copy JSON</button>
+          <button class="btn btn-small btn-ghost" id="btn-toggle-json">Show/Hide</button>
+        </div>
+        <div class="json-box hidden" id="json-output"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
