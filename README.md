@@ -54,7 +54,7 @@ player-badges/
   worker/
     index.js                 Cloudflare Worker (badge API)
     wrangler.toml            Worker config
-  drafts/                    Test files, screenshots
+  fonts/                     Bundled fonts (Roboto, Noto Sans) — see fonts/README.md
 ```
 
 ## SVG design
@@ -104,7 +104,7 @@ GET /v1/badge.json?l=en&g=res,hdr&x=p-480p,p-hlg&go=hdr,res
 | `ch` | Channels | 7.1, 5.1, 2.0, 1.0 |
 | `src` | Source | Remux, BluRay, WebDL, WebRip, HDTV, DVDScr, DVDRip, CAM, R5 |
 | `spc` | Special | IMAX Enhanced, IMAX, SeaDex |
-| `lang` | Language | 34 languages × 27 locales |
+| `lang` | Language | 35 languages × 27 locales |
 
 ## Scripts
 
@@ -156,6 +156,8 @@ bash scripts/deploy-all.sh
 ## Localization notes
 
 - 27 UI locales for language badge labels
-- `pt` (Portugal) and `pt-br` (Brazil) have distinct translations: Polaco/Polonês, Checo/Tcheco
+- Brazilian Portuguese (`pt-BR`) is a separate badge from European Portuguese (`pt`) in both contexts
+- `pt` (Portugal) and `pt-br` (Brazil) UI locales have distinct translations: Polaco/Polonês, Checo/Tcheco
+- Source language regex includes emoji flag matching (🇵🇱, 🇬🇧, 🇧🇷, etc.) and script detection (CJK, Cyrillic, Arabic)
 - Non-Latin scripts use Noto Sans fallback (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek)
 - ISO locale uses 3-letter codes (ENG, POL, SPA)
