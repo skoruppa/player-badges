@@ -40,7 +40,7 @@ const GROUP_FILTERS = {
   src: ["p-remux", "p-bluray", "p-webdl", "p-webrip", "p-hdtv", "p-dvdscr", "p-dvdrip", "p-cam", "p-r5"],
   spc: ["p-imax-e", "p-imax", "p-seadex"],
   lang: [
-    "p-eng", "p-pol", "p-spa", "p-fre", "p-ger", "p-ita", "p-por", "p-rus",
+    "p-eng", "p-pol", "p-spa", "p-fre", "p-ger", "p-ita", "p-por", "p-por-br", "p-rus",
     "p-jpn", "p-kor", "p-zho", "p-hin", "p-ara", "p-tur", "p-dut", "p-swe",
     "p-nor", "p-dan", "p-fin", "p-ces", "p-hun", "p-ron", "p-ukr", "p-ell",
     "p-heb", "p-tha", "p-vie", "p-ind", "p-msa", "p-hrv", "p-srp", "p-bul",
