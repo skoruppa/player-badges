@@ -131,6 +131,31 @@ input[type="color"] {
   padding: 0;
 }
 
+/* Context cards */
+.context-cards {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+.context-card {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+.context-card svg { width: 100%; height: auto; display: block; border-radius: 4px; }
+.context-card span { display: block; font-size: 11px; color: var(--text2); margin-top: 4px; }
+.context-card:hover { border-color: #444; }
+.context-card.active {
+  border-color: var(--accent);
+  background: rgba(74, 158, 255, 0.06);
+}
+.context-card.active span { color: var(--accent); }
+
 /* Style pills */
 .style-pills { display: flex; gap: 4px; }
 .pill {
