@@ -193,14 +193,37 @@ LABEL_OVERRIDES = {
     },
 }
 
-# Short label overrides for Brazilian Portuguese (Babel gives long "Portuguese (Brazil)")
+# Short label overrides for Brazilian Portuguese — adjective form per locale
 PT_BR_LABELS = {
-    "en": "Pt-BR", "pl": "Pt-BR", "de": "Pt-BR", "es": "Pt-BR", "fr": "Pt-BR",
-    "it": "Pt-BR", "pt": "Brasileiro", "pt_BR": "Brasileiro", "ru": "Pt-BR",
-    "tr": "Pt-BR", "nl": "Pt-BR", "hu": "Pt-BR", "cs": "Pt-BR", "hr": "Pt-BR",
-    "ro": "Pt-BR", "sk": "Pt-BR", "vi": "Pt-BR", "id": "Pt-BR", "bg": "Pt-BR",
-    "ja": "Pt-BR", "ar": "Pt-BR", "el": "Pt-BR", "he": "Pt-BR", "bn": "Pt-BR",
-    "ur": "Pt-BR", "nb": "Pt-BR", "sv": "Pt-BR", "da": "Pt-BR", "fi": "Pt-BR",
+    "en": "Brazilian",
+    "pl": "Brazylijski",
+    "de": "Brasilianisch",
+    "es": "Brasileño",
+    "fr": "Brésilien",
+    "it": "Brasiliano",
+    "pt": "Brasileiro",
+    "pt_BR": "Brasileiro",
+    "ru": "Бразильский",
+    "tr": "Brezilya",
+    "nl": "Braziliaans",
+    "hu": "Brazil",
+    "cs": "Brazilský",
+    "hr": "Brazilski",
+    "ro": "Brazilian",
+    "sk": "Brazílsky",
+    "vi": "Brazil",
+    "id": "Brasil",
+    "bg": "Бразилски",
+    "ja": "ブラジル",
+    "ar": "برازيلي",
+    "el": "Βραζιλιάνικα",
+    "he": "ברזילאי",
+    "bn": "ব্রাজিলীয়",
+    "ur": "برازیلی",
+    "nb": "Brasiliansk",
+    "sv": "Brasiliansk",
+    "da": "Brasiliansk",
+    "fi": "Brasilian",
 }
 
 

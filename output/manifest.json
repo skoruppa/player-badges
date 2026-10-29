@@ -626,7 +626,7 @@
     {
       "id": "p-por-br",
       "groupId": "lang",
-      "name": "Pt-BR",
+      "name": "Brazilian",
       "iso3": "por-br",
       "pattern": "(?i)(?:^| )(pt-br|pob|portuguese[\\s(]+brazil)",
       "assetPath": "language/{locale}/vectorized/por-br.svg",
@@ -1991,7 +1991,7 @@
     {
       "id": "s-por-br",
       "groupId": "lang",
-      "name": "Pt-BR",
+      "name": "Brazilian",
       "iso3": "por-br",
       "pattern": "(?i)\\bportuguese[\\s._-]?brazil\\b|\\bpt[\\s._-]?br\\b|\\bbrazilian\\b|\\U0001F1E7\\U0001F1F7",
       "assetPath": "language/{locale}/text-only/por-br.svg",
