@@ -12,3 +12,6 @@ Thumbs.db
 
 # Wrangler local state
 .wrangler/
+
+# Drafts / test files
+drafts/
