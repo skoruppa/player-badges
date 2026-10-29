@@ -61,23 +61,25 @@ const SOURCE_LANG_FILTERS = [
 const ALL_LANG_IDS = new Set([...GROUP_FILTERS.lang, ...SOURCE_LANG_FILTERS]);
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    // Purge cache endpoint (POST /v1/purge?key=<secret>)
+    if (url.pathname === "/v1/purge" && request.method === "POST") {
+      const key = url.searchParams.get("key");
+      if (key !== env.PURGE_KEY) {
+        return new Response("Forbidden", { status: 403 });
+      }
+      await ctx.cache.purge({ purgeEverything: true });
+      return new Response(JSON.stringify({ ok: true, message: "Cache purged" }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     // Only handle /v1/badge.json
     if (url.pathname !== "/v1/badge.json") {
       return new Response("Not found", { status: 404 });
     }
-
-    // Normalize URL for consistent cache keys (sort query params)
-    url.searchParams.sort();
-    const normalizedUrl = url.toString();
-
-    // Check Cloudflare edge cache first
-    const cache = caches.default;
-    const cacheKey = new Request(normalizedUrl);
-    let response = await cache.match(cacheKey);
-    if (response) return response;
 
     // Parse params
     const locale = url.searchParams.get("l") || "en";
@@ -156,19 +158,13 @@ export default {
       .filter(Boolean);
     const body = JSON.stringify({ groups, filters });
 
-    response = new Response(body, {
+    return new Response(body, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-        // Browser: 1 day, Cloudflare edge: 30 days
         "Cache-Control": "public, max-age=86400",
         "CDN-Cache-Control": "public, max-age=2592000",
       },
     });
-
-    // Store in Cloudflare edge cache (same PoP serves subsequent requests without hitting worker)
-    await cache.put(cacheKey, response.clone());
-
-    return response;
   },
 };
