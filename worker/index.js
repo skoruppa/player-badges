@@ -162,8 +162,8 @@ export default {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-        "Cache-Control": "public, max-age=86400",
-        "CDN-Cache-Control": "public, max-age=2592000",
+        "Cache-Control": "public, max-age=3600",
+        "CDN-Cache-Control": "public, max-age=31536000",
       },
     });
   },
