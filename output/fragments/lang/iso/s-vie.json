@@ -2,7 +2,7 @@
   "id": "s-vie",
   "groupId": "lang",
   "name": "Vietnamese",
-  "pattern": "(?i)\\bvietnamese\\b|\\bvie\\b|\\bvi\\b",
+  "pattern": "(?i)\\bvietnamese\\b|\\bvie\\b|\\bvi\\b|\\U0001F1FB\\U0001F1F3",
   "imageURL": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDIyIDE0Ij4KICA8cGF0aCBkPSJNOS43NSw0LjA5IEw3LjQ1LDEwLjUwIEw2LjM4LDEwLjUwIEw0LjA4LDQuMDkgTDUuMzAsNC4wOSBMNi45MSw5LjExIEw4LjUzLDQuMDkgTDkuNzUsNC4wOSBaIE0xMS42Niw0LjA5IEwxMS42NiwxMC41MCBMMTAuNTUsMTAuNTAgTDEwLjU1LDQuMDkgTDExLjY2LDQuMDkgWiBNMTMuMDMsMTAuNTAgTDEzLjAzLDQuMDkgTDE3LjE5LDQuMDkgTDE3LjE5LDUuMDAgTDE0LjE0LDUuMDAgTDE0LjE0LDYuNzcgTDE2Ljc3LDYuNzcgTDE2Ljc3LDcuNjQgTDE0LjE0LDcuNjQgTDE0LjE0LDkuNjEgTDE3LjIyLDkuNjEgTDE3LjIyLDEwLjUwIEwxMy4wMywxMC41MCBaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
   "isEnabled": true,
   "tagColor": "#00000000",
