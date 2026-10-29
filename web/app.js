@@ -14,9 +14,6 @@ let currentStyle = DEFAULT_STYLE;
 let fillColor = '#000000';
 let noBorder = false;
 
-// Base path for output files — auto-detected for GitHub Pages subpath
-let basePath = '';
-
 // ── i18n ───────────────────────────────────────────────────────────────────
 
 function detectBrowserLocale() {
@@ -53,12 +50,7 @@ async function init() {
   const uiLang = detectBrowserLocale();
   applyTranslations(uiLang);
 
-  // Base path for output files — works on Cloudflare Pages (root), GitHub Pages (subpath), and localhost
-  basePath = location.pathname.includes('/player-badges/')
-    ? '/player-badges'
-    : '';
-
-  manifest = await fetch(`${basePath}/output/manifest.json`).then(r => r.json());
+  manifest = await fetch('/output/manifest.json').then(r => r.json());
 
   // Populate locale selector
   const localeSelect = document.getElementById('locale-select');
@@ -146,14 +138,14 @@ async function loadBadges() {
 
   // Load all fragments in one request (bundle = static + lang for this locale/context)
   try {
-    const bundle = await fetch(`${basePath}/output/bundles/${context}-${locale}.json`).then(r => r.json());
+    const bundle = await fetch(`/output/bundles/${context}-${locale}.json`).then(r => r.json());
     for (const [id, fragment] of Object.entries(bundle)) {
       fragments[id] = fragment;
     }
   } catch (e) {
     console.warn('Bundle not found, falling back to en', e);
     try {
-      const bundle = await fetch(`${basePath}/output/bundles/${context}-en.json`).then(r => r.json());
+      const bundle = await fetch(`/output/bundles/${context}-en.json`).then(r => r.json());
       for (const [id, fragment] of Object.entries(bundle)) {
         fragments[id] = fragment;
       }
