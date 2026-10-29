@@ -260,11 +260,14 @@ function buildSidebar() {
     toggleInput.checked = badgeIds.every(id => selectedBadges.has(id));
     toggleInput.addEventListener('change', event => {
       event.stopPropagation();
+      const badgeEls = section.querySelectorAll('.badge-item');
       badgeIds.forEach(id => {
         if (toggleInput.checked) selectedBadges.add(id);
         else selectedBadges.delete(id);
       });
-      buildSidebar();
+      badgeEls.forEach(el => {
+        el.classList.toggle('selected', selectedBadges.has(el.dataset.id));
+      });
       updatePreview();
     });
     const toggleSlider = document.createElement('span');

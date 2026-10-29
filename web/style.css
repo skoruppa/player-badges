@@ -198,7 +198,7 @@ input[type="color"] {
   inset: 0;
   background: var(--border);
   border-radius: 9px;
-  transition: background 0.15s;
+  transition: background 0.25s ease;
 }
 .toggle-slider::before {
   content: '';
@@ -209,7 +209,7 @@ input[type="color"] {
   top: 2px;
   background: var(--text2);
   border-radius: 50%;
-  transition: transform 0.15s, background 0.15s;
+  transition: transform 0.25s ease, background 0.25s ease;
 }
 .group-toggle input:checked + .toggle-slider { background: var(--accent); }
 .group-toggle input:checked + .toggle-slider::before {
