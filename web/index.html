@@ -91,7 +91,10 @@
     </div>
 
     <div class="control-section">
-      <h3 id="t-style">Style</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <h3 id="t-style">Style</h3>
+        <span class="reset-btn" id="reset-style">Reset</span>
+      </div>
       <div class="style-pills" id="style-pills">
         <div class="pill active" data-value="bordered" id="pill-bordered">Bordered</div>
         <div class="pill" data-value="filled" id="pill-filled">Filled</div>
@@ -99,12 +102,14 @@
       <div class="color-row" style="margin-top:8px">
         <label>Border</label>
         <input type="color" id="border-color-picker" value="#ffffff">
+        <input class="hex-input" id="border-color-hex" value="#ffffff" maxlength="7">
         <input type="range" id="border-opacity" min="0" max="100" value="100" class="opacity-slider">
         <span class="opacity-value" id="border-opacity-value">100%</span>
       </div>
       <div class="color-row filled-only" id="fill-row">
         <label>Fill</label>
         <input type="color" id="fill-color-picker" value="#000000">
+        <input class="hex-input" id="fill-color-hex" value="#000000" maxlength="7">
         <input type="range" id="fill-opacity" min="0" max="100" value="100" class="opacity-slider">
         <span class="opacity-value" id="fill-opacity-value">100%</span>
       </div>

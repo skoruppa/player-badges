@@ -124,7 +124,7 @@ select, .hex-input {
   font-size: 12px;
 }
 select { width: 100%; }
-.hex-input { width: 90px; font-family: monospace; }
+.hex-input { width: 70px; font-family: monospace; }
 input[type="color"] {
   width: 28px;
   height: 22px;
@@ -136,6 +136,17 @@ input[type="color"] {
 }
 
 /* Context cards */
+.reset-btn {
+  font-size: 11px;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition: all 0.12s;
+}
+.reset-btn:hover { color: var(--accent); border-color: var(--accent); }
+
 .context-cards {
   display: flex;
   gap: 8px;
@@ -193,6 +204,7 @@ input[type="color"] {
 .color-row label { min-width: 40px; color: var(--text2); }
 .opacity-slider {
   flex: 1;
+  min-width: 40px;
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
