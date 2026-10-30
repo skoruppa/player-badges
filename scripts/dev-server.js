@@ -69,7 +69,7 @@ function handleBadgeApi(query) {
   const groupsParam = query.g || 'res,hdr,aud,ch,src,spc,lang';
   const excludeParam = query.x || '';
   const groupOrderParam = query.go || '';
-  const style = query.s || 'filled';
+  const style = query.s || 'bordered';
   const tc = decodeURIComponent(query.tc || '#00000000');
   const bc = decodeURIComponent(query.bc || '#FFFFFFFF');
 
@@ -122,9 +122,9 @@ function handleBadgeApi(query) {
 
     try {
       const data = JSON.parse(fs.readFileSync(fragPath, 'utf-8'));
-      data.tagStyle = style === 'none' ? 'filled' : style;
-      data.tagColor = style === 'none' ? '#00000000' : tc;
-      data.borderColor = style === 'bordered' ? bc : (style === 'none' ? '#00000000' : bc);
+      data.tagStyle = style;
+      data.tagColor = tc;
+      data.borderColor = bc;
       filters.push(data);
     } catch {
       // Fragment not found for this locale

@@ -87,7 +87,7 @@ export default {
     const groupsParam = url.searchParams.get("g") || "res,hdr,aud,ch,src,spc,lang";
     const excludeParam = url.searchParams.get("x");
     const groupOrderParam = url.searchParams.get("go");
-    const style = url.searchParams.get("s") || "filled";
+    const style = url.searchParams.get("s") || "bordered";
     const tc = decodeURIComponent(url.searchParams.get("tc") || "#00000000");
     const bc = decodeURIComponent(url.searchParams.get("bc") || "#FFFFFFFF");
 
@@ -144,9 +144,9 @@ export default {
       if (!data) continue;
 
       // Apply style overrides
-      data.tagStyle = style === "none" ? "filled" : style;
-      data.tagColor = style === "none" ? "#00000000" : tc;
-      data.borderColor = style === "bordered" ? bc : (style === "none" ? "#00000000" : bc);
+      data.tagStyle = style;
+      data.tagColor = tc;
+      data.borderColor = bc;
 
       filters.push(data);
     }
