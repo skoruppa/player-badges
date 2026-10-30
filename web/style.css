@@ -58,6 +58,10 @@ body {
   gap: 6px;
   min-height: 32px;
   align-items: center;
+  padding: 12px;
+  border-radius: 6px;
+  background:
+    repeating-conic-gradient(#333 0% 25%, #2a2a2a 0% 50%) 0 0 / 16px 16px;
 }
 .preview-chip {
   height: 28px;
