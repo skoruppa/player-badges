@@ -125,8 +125,8 @@ async function init() {
     document.querySelectorAll('#style-pills .pill').forEach(p =>
       p.classList.toggle('active', p.dataset.value === currentStyle)
     );
-    document.getElementById('fill-row').classList.toggle('visible', currentStyle === 'filled');
   }
+  document.getElementById('fill-row').classList.toggle('visible', currentStyle === 'filled');
   if (saved?.fillColor) {
     fillColor = saved.fillColor;
     document.getElementById('fill-color-picker').value = fillColor;
