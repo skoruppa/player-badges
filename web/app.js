@@ -12,10 +12,18 @@ let groupOrder = [];
 let badgeOrder = {};
 let currentStyle = DEFAULT_STYLE;
 let fillColor = '#000000';
-let noBorder = false;
+let fillOpacity = 100;
+let borderColor = '#ffffff';
+let borderOpacity = 100;
 
 function getContext() {
   return document.querySelector('#context-cards .context-card.active')?.dataset.value || 'player';
+}
+
+// Convert hex color (#rrggbb) + opacity (0-100) to #AARRGGBB format
+function toArgb(hex, opacity) {
+  const alpha = Math.round(opacity * 2.55).toString(16).padStart(2, '0').toUpperCase();
+  return '#' + alpha + hex.replace('#', '').toUpperCase();
 }
 
 // ── Persistence ────────────────────────────────────────────────────────────
@@ -29,7 +37,9 @@ function saveState() {
       context: getContext(),
       style: currentStyle,
       fillColor,
-      noBorder,
+      fillOpacity,
+      borderColor,
+      borderOpacity,
       selectedBadges: [...selectedBadges],
       groupOrder,
     }));
@@ -60,9 +70,6 @@ function applyTranslations(lang) {
   document.getElementById('t-style').textContent = translations.style;
   document.getElementById('pill-bordered').textContent = translations.bordered;
   document.getElementById('pill-filled').textContent = translations.filled;
-  document.getElementById('pill-none').textContent = translations.none;
-  document.getElementById('t-fill').textContent = translations.fill;
-  document.getElementById('t-noborder').textContent = translations.noborder;
   document.getElementById('t-preview').textContent = translations.preview;
   document.getElementById('t-preview-desktop').textContent = translations.preview;
   document.getElementById('t-url').textContent = translations.url;
@@ -118,16 +125,25 @@ async function init() {
     document.querySelectorAll('#style-pills .pill').forEach(p =>
       p.classList.toggle('active', p.dataset.value === currentStyle)
     );
-    document.getElementById('filled-options').classList.toggle('visible', currentStyle === 'filled');
+    document.getElementById('fill-row').classList.toggle('visible', currentStyle === 'filled');
   }
   if (saved?.fillColor) {
     fillColor = saved.fillColor;
     document.getElementById('fill-color-picker').value = fillColor;
-    document.getElementById('fill-color-hex').value = fillColor;
   }
-  if (saved?.noBorder) {
-    noBorder = true;
-    document.getElementById('no-border-checkbox').checked = true;
+  if (saved?.fillOpacity != null) {
+    fillOpacity = saved.fillOpacity;
+    document.getElementById('fill-opacity').value = fillOpacity;
+    document.getElementById('fill-opacity-value').textContent = fillOpacity + '%';
+  }
+  if (saved?.borderColor) {
+    borderColor = saved.borderColor;
+    document.getElementById('border-color-picker').value = borderColor;
+  }
+  if (saved?.borderOpacity != null) {
+    borderOpacity = saved.borderOpacity;
+    document.getElementById('border-opacity').value = borderOpacity;
+    document.getElementById('border-opacity-value').textContent = borderOpacity + '%';
   }
 
   // Style pills
@@ -137,25 +153,30 @@ async function init() {
       document.querySelectorAll('#style-pills .pill').forEach(p =>
         p.classList.toggle('active', p === pill)
       );
-      document.getElementById('filled-options').classList.toggle('visible', currentStyle === 'filled');
+      document.getElementById('fill-row').classList.toggle('visible', currentStyle === 'filled');
       updatePreview();
     });
   });
 
-  // Fill color
-  document.getElementById('fill-color-picker').addEventListener('input', event => {
-    fillColor = event.target.value;
-    document.getElementById('fill-color-hex').value = fillColor;
+  // Border color + opacity
+  document.getElementById('border-color-picker').addEventListener('input', e => {
+    borderColor = e.target.value;
     updatePreview();
   });
-  document.getElementById('fill-color-hex').addEventListener('input', event => {
-    fillColor = event.target.value;
+  document.getElementById('border-opacity').addEventListener('input', e => {
+    borderOpacity = parseInt(e.target.value);
+    document.getElementById('border-opacity-value').textContent = borderOpacity + '%';
     updatePreview();
   });
 
-  // No border checkbox
-  document.getElementById('no-border-checkbox').addEventListener('change', event => {
-    noBorder = event.target.checked;
+  // Fill color + opacity
+  document.getElementById('fill-color-picker').addEventListener('input', e => {
+    fillColor = e.target.value;
+    updatePreview();
+  });
+  document.getElementById('fill-opacity').addEventListener('input', e => {
+    fillOpacity = parseInt(e.target.value);
+    document.getElementById('fill-opacity-value').textContent = fillOpacity + '%';
     updatePreview();
   });
 
@@ -453,15 +474,15 @@ function updatePreview() {
       const chip = document.createElement('div');
       chip.className = 'preview-chip';
 
+      const borderRgba = `rgba(${parseInt(borderColor.slice(1,3),16)},${parseInt(borderColor.slice(3,5),16)},${parseInt(borderColor.slice(5,7),16)},${borderOpacity/100})`;
+
       if (currentStyle === 'bordered') {
         chip.style.background = 'transparent';
-        chip.style.border = '1px solid rgba(255, 255, 255, 0.24)';
-      } else if (currentStyle === 'filled') {
-        chip.style.background = fillColor;
-        chip.style.border = noBorder ? '1px solid transparent' : '1px solid rgba(255, 255, 255, 0.24)';
+        chip.style.border = `1px solid ${borderRgba}`;
       } else {
-        chip.style.background = 'transparent';
-        chip.style.border = '1px solid transparent';
+        const fillRgba = `rgba(${parseInt(fillColor.slice(1,3),16)},${parseInt(fillColor.slice(3,5),16)},${parseInt(fillColor.slice(5,7),16)},${fillOpacity/100})`;
+        chip.style.background = fillRgba;
+        chip.style.border = `1px solid ${borderRgba}`;
       }
 
       const img = document.createElement('img');
@@ -469,18 +490,15 @@ function updatePreview() {
       chip.appendChild(img);
       previewContainer.appendChild(chip);
 
-      // Build filter for JSON
-      const fillHex = fillColor.length === 7
-        ? 'FF' + fillColor.substring(1)
-        : fillColor.replace('#', '');
+      // Build filter for JSON — #AARRGGBB format
+      const tagColorArgb = currentStyle === 'filled' ? toArgb(fillColor, fillOpacity) : '#00000000';
+      const borderColorArgb = toArgb(borderColor, borderOpacity);
 
       filters.push({
         ...fragment,
         tagStyle: currentStyle === 'bordered' ? 'bordered' : 'filled',
-        tagColor: currentStyle === 'filled' ? '#' + fillHex : '#00000000',
-        borderColor: (currentStyle === 'none' || (currentStyle === 'filled' && noBorder))
-          ? '#00000000'
-          : '#FFFFFFFF',
+        tagColor: tagColorArgb,
+        borderColor: borderColorArgb,
       });
     }
   }
@@ -539,12 +557,18 @@ function updatePreview() {
     params += `&s=${currentStyle}`;
   }
   if (currentStyle === 'filled') {
-    if (fillColor !== '#000000') {
+    if (fillColor !== '#000000' || fillOpacity !== 100) {
       params += `&fc=${encodeURIComponent(fillColor)}`;
     }
-    if (noBorder) {
-      params += `&nb=1`;
+    if (fillOpacity !== 100) {
+      params += `&fo=${fillOpacity}`;
     }
+  }
+  if (borderColor !== '#ffffff' || borderOpacity !== 100) {
+    params += `&bc=${encodeURIComponent(borderColor)}`;
+  }
+  if (borderOpacity !== 100) {
+    params += `&bo=${borderOpacity}`;
   }
 
   // go= group order (only when reordered from manifest default)

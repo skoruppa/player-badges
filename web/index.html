@@ -95,21 +95,18 @@
       <div class="style-pills" id="style-pills">
         <div class="pill active" data-value="bordered" id="pill-bordered">Bordered</div>
         <div class="pill" data-value="filled" id="pill-filled">Filled</div>
-        <div class="pill" data-value="none" id="pill-none">None</div>
       </div>
-      <div class="filled-options" id="filled-options">
-        <div class="control-row">
-          <label id="t-fill">Fill color</label>
-          <input type="color" id="fill-color-picker" value="#000000">
-          <input class="hex-input" id="fill-color-hex" value="#000000">
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-          <span id="t-noborder" style="font-size:12px">No border</span>
-          <label class="group-toggle">
-            <input type="checkbox" id="no-border-checkbox">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
+      <div class="color-row" style="margin-top:8px">
+        <label>Border</label>
+        <input type="color" id="border-color-picker" value="#ffffff">
+        <input type="range" id="border-opacity" min="0" max="100" value="100" class="opacity-slider">
+        <span class="opacity-value" id="border-opacity-value">100%</span>
+      </div>
+      <div class="color-row filled-only" id="fill-row">
+        <label>Fill</label>
+        <input type="color" id="fill-color-picker" value="#000000">
+        <input type="range" id="fill-opacity" min="0" max="100" value="100" class="opacity-slider">
+        <span class="opacity-value" id="fill-opacity-value">100%</span>
       </div>
     </div>
 
