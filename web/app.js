@@ -130,6 +130,7 @@ async function init() {
   if (saved?.fillColor) {
     fillColor = saved.fillColor;
     document.getElementById('fill-color-picker').value = fillColor;
+    document.getElementById('fill-color-hex').value = fillColor;
   }
   if (saved?.fillOpacity != null) {
     fillOpacity = saved.fillOpacity;
@@ -139,6 +140,7 @@ async function init() {
   if (saved?.borderColor) {
     borderColor = saved.borderColor;
     document.getElementById('border-color-picker').value = borderColor;
+    document.getElementById('border-color-hex').value = borderColor;
   }
   if (saved?.borderOpacity != null) {
     borderOpacity = saved.borderOpacity;
@@ -161,7 +163,16 @@ async function init() {
   // Border color + opacity
   document.getElementById('border-color-picker').addEventListener('input', e => {
     borderColor = e.target.value;
+    document.getElementById('border-color-hex').value = borderColor;
     updatePreview();
+  });
+  document.getElementById('border-color-hex').addEventListener('input', e => {
+    const v = e.target.value;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+      borderColor = v;
+      document.getElementById('border-color-picker').value = v;
+      updatePreview();
+    }
   });
   document.getElementById('border-opacity').addEventListener('input', e => {
     borderOpacity = parseInt(e.target.value);
@@ -172,12 +183,49 @@ async function init() {
   // Fill color + opacity
   document.getElementById('fill-color-picker').addEventListener('input', e => {
     fillColor = e.target.value;
+    document.getElementById('fill-color-hex').value = fillColor;
     updatePreview();
+  });
+  document.getElementById('fill-color-hex').addEventListener('input', e => {
+    const v = e.target.value;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+      fillColor = v;
+      document.getElementById('fill-color-picker').value = v;
+      updatePreview();
+    }
   });
   document.getElementById('fill-opacity').addEventListener('input', e => {
     fillOpacity = parseInt(e.target.value);
     document.getElementById('fill-opacity-value').textContent = fillOpacity + '%';
     updatePreview();
+  });
+
+  // Reset everything
+  document.getElementById('reset-style').addEventListener('click', () => {
+    // Clear saved state
+    localStorage.removeItem(STORAGE_KEY);
+    // Reset style
+    currentStyle = DEFAULT_STYLE;
+    borderColor = '#ffffff'; borderOpacity = 100;
+    fillColor = '#000000'; fillOpacity = 100;
+    document.querySelectorAll('#style-pills .pill').forEach(p =>
+      p.classList.toggle('active', p.dataset.value === currentStyle)
+    );
+    document.getElementById('fill-row').classList.remove('visible');
+    document.getElementById('border-color-picker').value = '#ffffff';
+    document.getElementById('border-color-hex').value = '#ffffff';
+    document.getElementById('border-opacity').value = 100;
+    document.getElementById('border-opacity-value').textContent = '100%';
+    document.getElementById('fill-color-picker').value = '#000000';
+    document.getElementById('fill-color-hex').value = '#000000';
+    document.getElementById('fill-opacity').value = 100;
+    document.getElementById('fill-opacity-value').textContent = '100%';
+    // Reset context to player
+    document.querySelectorAll('#context-cards .context-card').forEach(c =>
+      c.classList.toggle('active', c.dataset.value === 'player')
+    );
+    // Reload all badges (resets selection, group order)
+    loadBadges(true);
   });
 
   // Copy buttons
@@ -210,11 +258,11 @@ async function init() {
 
 // ── Load badges ────────────────────────────────────────────────────────────
 
-async function loadBadges() {
+async function loadBadges(forceSelectAll = false) {
   const locale = document.getElementById('locale-select').value;
   const context = getContext();
-  const saved = loadState();
-  const previousSelected = new Set(selectedBadges);
+  const saved = forceSelectAll ? null : loadState();
+  const previousSelected = forceSelectAll ? new Set() : new Set(selectedBadges);
   fragments = {};
   selectedBadges.clear();
   groupOrder = manifest.groups.map(g => g.id);
