@@ -552,23 +552,17 @@ function updatePreview() {
     params += `&x=${excluded.join(',')}`;
   }
 
-  // Style
+  // Style + colors as #AARRGGBB
   if (currentStyle !== DEFAULT_STYLE) {
     params += `&s=${currentStyle}`;
   }
-  if (currentStyle === 'filled') {
-    if (fillColor !== '#000000' || fillOpacity !== 100) {
-      params += `&fc=${encodeURIComponent(fillColor)}`;
-    }
-    if (fillOpacity !== 100) {
-      params += `&fo=${fillOpacity}`;
-    }
+  const tagColorArgb = currentStyle === 'filled' ? toArgb(fillColor, fillOpacity) : '#00000000';
+  const borderColorArgb = toArgb(borderColor, borderOpacity);
+  if (tagColorArgb !== '#00000000') {
+    params += `&tc=${encodeURIComponent(tagColorArgb)}`;
   }
-  if (borderColor !== '#ffffff' || borderOpacity !== 100) {
-    params += `&bc=${encodeURIComponent(borderColor)}`;
-  }
-  if (borderOpacity !== 100) {
-    params += `&bo=${borderOpacity}`;
+  if (borderColorArgb !== '#FFFFFFFF') {
+    params += `&bc=${encodeURIComponent(borderColorArgb)}`;
   }
 
   // go= group order (only when reordered from manifest default)
