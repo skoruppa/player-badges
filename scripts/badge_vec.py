@@ -23,6 +23,7 @@ def _font(name, system_path):
 
 ROBOTO_MEDIUM = _font("Roboto-Medium.ttf", "/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF/Roboto-Medium.ttf")
 ROBOTO_LIGHT = _font("Roboto-Light.ttf", "/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF/Roboto-Light.ttf")
+ROBOTO_BOLD = _font("Roboto-Bold.ttf", "/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF/Roboto-Bold.ttf")
 
 # ── Layout constants ────────────────────────────────────────────────────────
 PAD_L = 4
@@ -97,10 +98,10 @@ def ft_advance(ttf_path, text):
     return w
 
 
-def ft_to_path_d(ttf_path, text, x_offset=0):
+def ft_to_path_d(ttf_path, text, x_offset=0, size=FONT_SIZE, baseline=Y_BASELINE):
     """Convert text to SVG path `d` attribute using FreeType glyph outlines."""
     face = freetype.Face(ttf_path)
-    face.set_char_size(0, FONT_SIZE * 64, 72, 72)
+    face.set_char_size(0, int(size * 64), 72, 72)
     parts = []
     pen_x = x_offset
     for ch in text:
@@ -117,7 +118,7 @@ def ft_to_path_d(ttf_path, text, x_offset=0):
                 continue
 
             def tx(p):
-                return (pen_x + p[0] / 64.0, Y_BASELINE - p[1] / 64.0)
+                return (pen_x + p[0] / 64.0, baseline - p[1] / 64.0)
 
             fo = next((i for i in range(n) if ct[i] & 1), None)
             if fo is None:
@@ -163,8 +164,8 @@ def even_ceil(v):
 
 # ── Vectorized SVG builders ────────────────────────────────────────────────
 
-def vec_text_only(label):
-    d, adv = ft_to_path_d(ROBOTO_MEDIUM, label, PAD_L)
+def vec_text_only(label, font=ROBOTO_MEDIUM):
+    d, adv = ft_to_path_d(font, label, PAD_L)
     w = even_ceil(PAD_L + adv + PAD_R)
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="14" viewBox="0 0 {w} 14">\n'
@@ -172,14 +173,15 @@ def vec_text_only(label):
     )
 
 
-def vec_dolby(medium_text, light_text=None):
+def vec_dolby(medium_text, light_text=None, font=ROBOTO_MEDIUM):
     ix = PAD_L
     tx = ix + DD_ICON_W + DD_GAP
-    md, m_adv = ft_to_path_d(ROBOTO_MEDIUM, medium_text, tx)
+    md, m_adv = ft_to_path_d(font, medium_text, tx)
     icon = DD_ICON.format(x=ix)
     if light_text:
         lx = tx + m_adv + 3
-        ld, l_adv = ft_to_path_d(ROBOTO_LIGHT, light_text, lx)
+        light_font = ROBOTO_LIGHT if font == ROBOTO_MEDIUM else ROBOTO_MEDIUM
+        ld, l_adv = ft_to_path_d(light_font, light_text, lx)
         w = even_ceil(lx + l_adv + PAD_R)
         paths = f'<path d="{md}" fill="white"/>\n  <path d="{ld}" fill="white" fill-opacity="0.92"/>'
     else:
@@ -203,10 +205,10 @@ def vec_speaker(label):
     )
 
 
-def vec_icon_text(label, icon_tpl, icon_w, gap=3):
+def vec_icon_text(label, icon_tpl, icon_w, gap=3, font=ROBOTO_MEDIUM):
     ix = PAD_L
     tx = ix + icon_w + gap
-    d, adv = ft_to_path_d(ROBOTO_MEDIUM, label, tx)
+    d, adv = ft_to_path_d(font, label, tx)
     w = even_ceil(tx + adv + PAD_R)
     icon = icon_tpl.format(x=ix)
     return (
@@ -241,16 +243,16 @@ STATIC_BADGES = {
     "p-720p":  ("resolution/720p.svg",  "text", ("720p",)),
     "p-480p":  ("resolution/480p.svg",  "text", ("480p",)),
 
-    "p-dv":     ("hdr/dolby-vision.svg", "dolby", ("Dolby", "Vision")),
+    "p-dv":     ("hdr/dolby-vision.svg", "dolby", ("Dolby", "Vision", "VISION")),
     "p-hdr10p": ("hdr/hdr10plus.svg",   "text",  ("HDR10+",)),
     "p-hdr10":  ("hdr/hdr10.svg",       "text",  ("HDR10",)),
     "p-hlg":    ("hdr/hlg.svg",         "text",  ("HLG",)),
     "p-hdr":    ("hdr/hdr.svg",         "text",  ("HDR",)),
 
-    "p-atmos":   ("audio/dolby-atmos.svg",       "dolby", ("Dolby", "Atmos")),
-    "p-truehd":  ("audio/dolby-truehd.svg",      "dolby", ("Dolby TrueHD", None)),
-    "p-ddp":     ("audio/dolby-digital-plus.svg", "dolby", ("Dolby Digital+", None)),
-    "p-dd":      ("audio/dolby-digital.svg",     "dolby", ("Dolby Digital", None)),
+    "p-atmos":   ("audio/dolby-atmos.svg",       "dolby", ("Dolby", "Atmos", "ATMOS")),
+    "p-truehd":  ("audio/dolby-truehd.svg",      "dolby", ("Dolby TrueHD", None, "TRUEHD")),
+    "p-ddp":     ("audio/dolby-digital-plus.svg", "dolby", ("Dolby Digital+", None, "DIGITAL+")),
+    "p-dd":      ("audio/dolby-digital.svg",     "dolby", ("Dolby Digital", None, "DIGITAL")),
     "p-dtsx":    ("audio/dtsx.svg",    "text", ("DTS:X",)),
     "p-dtshdma": ("audio/dts-hd-ma.svg", "text", ("DTS-HD MA",)),
     "p-dtshd":   ("audio/dts-hd.svg",  "text", ("DTS-HD",)),
@@ -290,8 +292,12 @@ ICON_MAP = {
 }
 
 
-def vectorize_badge(badge_id, base_dir=None):
-    """Generate vectorized SVG content for a static badge. Returns SVG string or None."""
+def vectorize_badge(badge_id, base_dir=None, bold=False, compact=False):
+    """Generate vectorized SVG content for a static badge. Returns SVG string or None.
+
+    bold swaps the text font, compact drops icons and shortens Dolby to mark + label.
+    Logos ("raw", "imax") have no variants.
+    """
     if base_dir is None:
         base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
@@ -299,19 +305,24 @@ def vectorize_badge(badge_id, base_dir=None):
         return None
 
     asset_path, vec_type, vec_args = STATIC_BADGES[badge_id]
+    font = ROBOTO_BOLD if bold else ROBOTO_MEDIUM
 
     if vec_type == "raw":
         full_path = os.path.join(base_dir, "assets", asset_path)
         with open(full_path, "r") as f:
             return f.read()
     elif vec_type == "text":
-        return vec_text_only(vec_args[0])
+        return vec_text_only(vec_args[0], font)
     elif vec_type == "dolby":
-        return vec_dolby(vec_args[0], vec_args[1] if len(vec_args) > 1 else None)
+        if not compact:
+            return vec_dolby(vec_args[0], vec_args[1], font)
+        return vec_icon_text(vec_args[2], DD_ICON, DD_ICON_W, DD_GAP, font)
     elif vec_type == "icon_text":
         label, icon_type = vec_args
+        if compact:
+            return vec_text_only(label, font)
         icon_tpl, icon_w = ICON_MAP[icon_type]
-        return vec_icon_text(label, icon_tpl, icon_w)
+        return vec_icon_text(label, icon_tpl, icon_w, font=font)
     elif vec_type == "imax":
         return vec_imax(base_dir)
     return None

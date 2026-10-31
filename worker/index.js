@@ -14,6 +14,8 @@
  *   go     - (optional) group display order (only when reordered)
  *   o.{gid}- (optional) badge order within a group, e.g. o.res=p-4k,p-1080p
  *   s      - tag style: filled, bordered, none
+ *   b      - bold text when 1 (logos stay unchanged)
+ *   cp     - compact badges without icons when 1
  *   tc     - tag color (#AARRGGBB)
  *   bc     - border color (#AARRGGBB)
  *
@@ -147,6 +149,9 @@ export default {
     const excludeParam = url.searchParams.get("x");
     const groupOrderParam = url.searchParams.get("go");
     const style = url.searchParams.get("s") || "bordered";
+    const bold = url.searchParams.get("b") === "1";
+    const compact = url.searchParams.get("cp") === "1";
+    const imageVariant = bold ? (compact ? "boldCompact" : "bold") : (compact ? "compact" : null);
     const presetName = url.searchParams.get("p");
     const preset = presetName ? PRESETS[presetName] : null;
     const presetVariant = preset ? (preset[style] || preset.bordered) : null;
@@ -212,6 +217,10 @@ export default {
       // Source context reports every tag found, not one per group
       if (context === "source" && data.sourcePattern) data.pattern = data.sourcePattern;
       delete data.sourcePattern;
+
+      // Bold/compact artwork; badges without a variant keep imageURL
+      if (data.images?.[imageVariant]) data.imageURL = data.images[imageVariant];
+      delete data.images;
 
       // Apply style overrides
       const badgeColor = presetBadgeColors[id];

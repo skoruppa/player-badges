@@ -6,6 +6,7 @@ so the output SVGs are font-independent and render identically on all platforms.
 ## Roboto (Apache 2.0)
 - `Roboto-Medium.ttf` — primary font for badge text (9px)
 - `Roboto-Light.ttf` — secondary weight for Dolby sub-labels
+- `Roboto-Bold.ttf` — bold variant
 
 Source: https://fonts.google.com/specimen/Roboto
 License: Apache License 2.0
@@ -18,6 +19,8 @@ License: Apache License 2.0
 - `NotoSansDevanagari-Regular.ttf` — Devanagari script (Hindi)
 - `NotoSansThai-Regular.ttf` — Thai script
 - `NotoSansCJK-Regular.ttc` — Chinese, Japanese, Korean
+
+Each Noto font also has a `-Bold` counterpart used by the bold variant.
 
 Source: https://fonts.google.com/noto
 License: SIL Open Font License 1.1

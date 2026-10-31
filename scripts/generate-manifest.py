@@ -241,6 +241,16 @@ def _svg_str_to_data_uri(svg_str):
     return "data:image/svg+xml;base64," + base64.b64encode(svg_str.encode()).decode()
 
 
+def _image_variants(base, bold, compact, bold_compact):
+    """Variant images that differ from the base; the worker falls back to imageURL."""
+    variants = {"bold": bold, "compact": compact, "boldCompact": bold_compact}
+    return {key: uri for key, uri in variants.items() if uri != base}
+
+
+def _lang_image(locale, subdir, iso3):
+    return _svg_to_data_uri(os.path.join(ASSETS_DIR, "language", locale, subdir, f"{iso3}.svg"))
+
+
 def main():
     os.makedirs(FRAGMENTS_DIR, exist_ok=True)
 
@@ -275,6 +285,15 @@ def main():
         }
         if fid in SOURCE_PATTERNS:
             fragment["sourcePattern"] = SOURCE_PATTERNS[fid]
+        if svg_content is not None:
+            images = _image_variants(
+                image_url,
+                _svg_str_to_data_uri(vectorize_badge(fid, bold=True)),
+                _svg_str_to_data_uri(vectorize_badge(fid, compact=True)),
+                _svg_str_to_data_uri(vectorize_badge(fid, bold=True, compact=True)),
+            )
+            if images:
+                fragment["images"] = images
         with open(os.path.join(FRAGMENTS_DIR, f"{fid}.json"), "w") as f:
             json.dump(fragment, f, indent=2)
 
@@ -306,6 +325,12 @@ def main():
                 "pattern": pattern,
                 "imageURL": _svg_to_data_uri(svg_path),
                 **BADGE_STYLE,
+                "images": _image_variants(
+                    _svg_to_data_uri(svg_path),
+                    _lang_image(locale, "vectorized-bold", iso3),
+                    _lang_image(locale, "text-only", iso3),
+                    _lang_image(locale, "text-only-bold", iso3),
+                ),
             }
             with open(os.path.join(locale_dir, f"{lid}.json"), "w") as f:
                 json.dump(fragment, f, indent=2)
@@ -342,6 +367,12 @@ def main():
                 "pattern": pattern,
                 "imageURL": _svg_to_data_uri(svg_path),
                 **BADGE_STYLE,
+                "images": _image_variants(
+                    _svg_to_data_uri(svg_path),
+                    _lang_image(locale, "text-only-bold", iso3),
+                    _lang_image(locale, "text-only", iso3),
+                    _lang_image(locale, "text-only-bold", iso3),
+                ),
             }
             with open(os.path.join(locale_dir, f"{sid}.json"), "w") as f:
                 json.dump(fragment, f, indent=2)

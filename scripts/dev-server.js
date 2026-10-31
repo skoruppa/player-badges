@@ -76,6 +76,9 @@ function handleBadgeApi(query) {
   const excludeParam = query.x || '';
   const groupOrderParam = query.go || '';
   const style = query.s || 'bordered';
+  const bold = query.b === '1';
+  const compact = query.cp === '1';
+  const imageVariant = bold ? (compact ? 'boldCompact' : 'bold') : (compact ? 'compact' : null);
   const tc = decodeURIComponent(query.tc || '#00000000');
   const bc = decodeURIComponent(query.bc || '#FFFFFFFF');
 
@@ -131,6 +134,8 @@ function handleBadgeApi(query) {
       const data = JSON.parse(fs.readFileSync(fragPath, 'utf-8'));
       if (context === 'source' && data.sourcePattern) data.pattern = data.sourcePattern;
       delete data.sourcePattern;
+      if (data.images?.[imageVariant]) data.imageURL = data.images[imageVariant];
+      delete data.images;
       data.tagStyle = style;
       data.tagColor = tc;
       data.borderColor = bc;

@@ -16,6 +16,8 @@ let fillOpacity = 100;
 let borderColor = '#ffffff';
 let borderOpacity = 100;
 let iconColor = '#ffffff';
+let boldText = false;
+let compactBadges = false;
 
 // Color presets — per-badge border colors
 const PRESETS = {
@@ -127,6 +129,16 @@ function recolorDataUri(dataUri, color) {
 
 const STORAGE_KEY = 'nuvio-badge-editor';
 
+function syncVariantToggles() {
+  document.getElementById('toggle-bold').checked = boldText;
+  document.getElementById('toggle-compact').checked = compactBadges;
+}
+
+function badgeImage(fragment) {
+  const variant = boldText ? (compactBadges ? 'boldCompact' : 'bold') : (compactBadges ? 'compact' : null);
+  return fragment.images?.[variant] || fragment.imageURL;
+}
+
 function saveState() {
   try {
     // Keep only manual reorders, per context, so default order changes still reach users
@@ -146,6 +158,8 @@ function saveState() {
       borderColor,
       borderOpacity,
       iconColor,
+      boldText,
+      compactBadges,
       activePreset,
       selectedBadges: [...selectedBadges],
       groupOrders,
@@ -177,6 +191,8 @@ function applyTranslations(lang) {
   document.getElementById('t-style').textContent = translations.style;
   document.getElementById('pill-bordered').textContent = translations.bordered;
   document.getElementById('pill-filled').textContent = translations.filled;
+  document.getElementById('t-bold').textContent = translations.bold;
+  document.getElementById('t-compact').textContent = translations.compact;
   document.getElementById('t-preview').textContent = translations.preview;
   document.getElementById('t-preview-desktop').textContent = translations.preview;
   document.getElementById('t-url').textContent = translations.url;
@@ -234,6 +250,9 @@ async function init() {
     );
   }
   document.getElementById('fill-row').classList.toggle('visible', currentStyle === 'filled');
+  boldText = !!saved?.boldText;
+  compactBadges = !!saved?.compactBadges;
+  syncVariantToggles();
   if (saved?.fillColor) {
     fillColor = saved.fillColor;
     document.getElementById('fill-color-picker').value = fillColor;
@@ -356,6 +375,18 @@ async function init() {
     updatePreview();
   });
 
+  // Bold / compact toggles
+  document.getElementById('toggle-bold').addEventListener('change', event => {
+    boldText = event.target.checked;
+    buildSidebar();
+    updatePreview();
+  });
+  document.getElementById('toggle-compact').addEventListener('change', event => {
+    compactBadges = event.target.checked;
+    buildSidebar();
+    updatePreview();
+  });
+
   // Reset everything
   document.getElementById('reset-style').addEventListener('click', () => {
     // Clear saved state
@@ -365,6 +396,9 @@ async function init() {
     borderColor = '#ffffff'; borderOpacity = 100;
     fillColor = '#000000'; fillOpacity = 100;
     iconColor = '#ffffff';
+    boldText = false;
+    compactBadges = false;
+    syncVariantToggles();
     badgeColors = {};
     activePreset = 'default';
     document.querySelectorAll('.preset-pill').forEach(p =>
@@ -629,7 +663,7 @@ function buildSidebar() {
       const item = document.createElement('div');
       item.className = 'badge-item' + (selectedBadges.has(badgeId) ? ' selected' : '');
       item.dataset.id = badgeId;
-      item.innerHTML = `<img src="${fragment.imageURL}" title="${fragment.name}">`;
+      item.innerHTML = `<img src="${badgeImage(fragment)}" title="${fragment.name}">`;
 
       // Click to toggle
       item.addEventListener('click', () => {
@@ -713,7 +747,7 @@ function updatePreview() {
       }
 
       const img = document.createElement('img');
-      img.src = recolorDataUri(fragment.imageURL, iconColor);
+      img.src = recolorDataUri(badgeImage(fragment), iconColor);
       chip.appendChild(img);
       previewContainer.appendChild(chip);
 
@@ -725,9 +759,12 @@ function updatePreview() {
         : '#00000000';
       const borderColorArgb = toArgb(badgeBorderColor, badgeBorderOpacity);
 
+      // Same shape as the worker output: no generator-only fields
+      const { images, sourcePattern, ...filter } = fragment;
       filters.push({
-        ...fragment,
-        imageURL: recolorDataUri(fragment.imageURL, iconColor),
+        ...filter,
+        pattern: (getContext() === 'source' && sourcePattern) || filter.pattern,
+        imageURL: recolorDataUri(badgeImage(fragment), iconColor),
         tagStyle: currentStyle === 'bordered' ? 'bordered' : 'filled',
         tagColor: tagColorArgb,
         borderColor: borderColorArgb,
@@ -788,6 +825,8 @@ function updatePreview() {
   if (currentStyle !== DEFAULT_STYLE) {
     params += `&s=${currentStyle}`;
   }
+  if (boldText) params += '&b=1';
+  if (compactBadges) params += '&cp=1';
   if (activePreset && activePreset !== 'default') {
     // Preset URL — short, cacheable
     params += `&p=${activePreset}`;

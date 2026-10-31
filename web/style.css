@@ -308,6 +308,16 @@ input[type="color"] {
   transform: translateX(16px);
   background: #fff;
 }
+.option-row { display: flex; gap: 16px; margin-top: 10px; }
+.option-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+}
+.option-toggle:has(input:checked) { color: var(--text); }
 .badge-grid {
   display: flex;
   flex-wrap: wrap;

@@ -28,7 +28,9 @@ player-badges/
     special/                 IMAX, IMAX Enhanced, SeaDex
     language/<locale>/
       vectorized/            Speaker icon + text (player context)
-      text-only/             Text only (source context)
+      text-only/             Text only (source context, compact player)
+      vectorized-bold/       Bold variant of vectorized/
+      text-only-bold/        Bold variant of text-only/
       preview/               Preview SVGs with <text> (for editing, not shipped)
   icons/                     Source SVG icons (disc, globe, tv, dvd, camera, imax)
   output/
@@ -64,9 +66,12 @@ player-badges/
 - **ViewBox**: 14px height, variable width
 - **Font**: Roboto Medium (9px), vectorized as `<path>` curves (font-independent, works on all platforms including iOS)
 - **Non-Latin scripts**: Noto Sans fallback chain (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek)
+- **Dolby**: DD logo with the full name; compact keeps the logo with a short uppercase label (VISION, ATMOS, DIGITAL+)
+- **Variants**: Fragments carry `images` (`bold`, `compact`, `boldCompact`); the worker swaps one into `imageURL`
 - **Icons**: Inline SVG shapes (Dolby DD logo, speaker with waves, disc, globe, TV, camera, IMAX logo)
 - **Colors**: White fill on transparent background
 - **Padding**: 4px left, 3px right
+- **Complex scripts**: Arabic, Hebrew, Bengali etc. are shaped with HarfBuzz (joined letters, RTL order, conjuncts); Roboto text is not, so its spacing stays unchanged
 - **No hinting**: `FT_LOAD_NO_HINTING` for even letter spacing at small sizes
 
 ## API
@@ -88,6 +93,8 @@ GET /v1/badge.json?l=en&g=res,hdr&x=p-480p,p-hlg&go=hdr,res
 | `go` | Group display order (when reordered) | player: `res,hdr,aud,ch,lang,src,spc`<br>source: `res,src,hdr,aud,ch,spc,lang` |
 | `o.{gid}` | Badge order within group (e.g. `o.lang=s-pol,s-eng`) | — |
 | `s` | Style: `bordered`, `filled`, `none` | `filled` |
+| `b` | Bold text (`1`); logos stay unchanged | off |
+| `cp` | Compact: no icons, Dolby as logo + short label (`1`) | off |
 | `tc` | Tag color (#AARRGGBB) | `#00000000` |
 | `bc` | Border color (#AARRGGBB) | `#FFFFFFFF` |
 
@@ -134,7 +141,7 @@ bash scripts/deploy-all.sh
 | `deploy-all.sh` | Full pipeline: regenerate → KV → worker → Pages |
 
 ### Requirements
-- Python 3.8+: `pip install -r requirements.txt` (freetype-py, babel)
+- Python 3.8+: `pip install -r requirements.txt` (freetype-py, babel, uharfbuzz)
 - Node.js 18+ (for dev server)
 - Wrangler CLI (for Cloudflare deploy): `npm install -g wrangler`
 - Fonts included in `fonts/` (Roboto Apache 2.0, Noto Sans OFL 1.1)

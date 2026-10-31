@@ -14,7 +14,9 @@ Usage:
 import freetype
 import math
 import os
+import unicodedata
 
+import uharfbuzz as hb
 from babel import Locale
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -35,8 +37,9 @@ SPEAKER_ICON = '''<g transform="translate({x}, 2)">
   </g>'''
 
 FONT_CHAIN = []
+_HB_FONTS = {}
 
-def _build_font_chain():
+def _build_font_chain(bold=False):
     """Look in project fonts/ first, fall back to system paths."""
     fonts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "fonts")
     candidates = [
@@ -51,6 +54,9 @@ def _build_font_chain():
     ]
     chain = []
     for name, system_path in candidates:
+        if bold:
+            name = name.replace("-Medium", "-Bold").replace("-Regular", "-Bold")
+            system_path = system_path.replace("-Medium", "-Bold").replace("-Regular", "-Bold")
         local = os.path.join(fonts_dir, name)
         path = local if os.path.exists(local) else system_path
         if os.path.exists(path):
@@ -81,13 +87,14 @@ AUDIO_TO_ISO3 = {
 }
 
 
-def _load_faces():
-    chain = _build_font_chain()
+def _load_faces(bold=False):
+    chain = _build_font_chain(bold)
     faces = []
     for path in chain:
         if os.path.exists(path):
             f = freetype.Face(path)
             f.set_char_size(0, FONT_SIZE * 64, 72, 72)
+            f.source_path = path
             faces.append(f)
     return faces
 
@@ -99,57 +106,105 @@ def _find_face(faces, ch):
     return faces[0]
 
 
-def _path_text(faces, text, x0=0):
-    parts = []
-    px = x0
+def _outline_path(outline, ox, parts):
+    """Append SVG path commands for a loaded glyph outline, with its origin at x=ox."""
+    pts, tgs, ctrs = outline.points, outline.tags, outline.contours
+    s = 0
+    for ce in ctrs:
+        cp = pts[s : ce + 1]
+        ct = tgs[s : ce + 1]
+        n = len(cp)
+        if n == 0:
+            s = ce + 1
+            continue
+
+        def tx(p):
+            return (ox + p[0] / 64.0, Y_BASELINE - p[1] / 64.0)
+
+        fo = next((i for i in range(n) if ct[i] & 1), None)
+        if fo is None:
+            p0, p1 = tx(cp[0]), tx(cp[1])
+            parts.append(f"M{(p0[0]+p1[0])/2:.2f},{(p0[1]+p1[1])/2:.2f}")
+            fo = -1
+        else:
+            p = tx(cp[fo])
+            parts.append(f"M{p[0]:.2f},{p[1]:.2f}")
+        i = 0
+        while i < n:
+            ci = (fo + 1 + i) % n if fo >= 0 else i % n
+            pt = tx(cp[ci])
+            tag = ct[ci]
+            if tag & 1:
+                parts.append(f"L{pt[0]:.2f},{pt[1]:.2f}")
+                i += 1
+            else:
+                ni = (ci + 1) % n
+                npt = tx(cp[ni])
+                ntag = ct[ni]
+                if ntag & 1:
+                    parts.append(f"Q{pt[0]:.2f},{pt[1]:.2f} {npt[0]:.2f},{npt[1]:.2f}")
+                    i += 2
+                else:
+                    mid = ((pt[0] + npt[0]) / 2, (pt[1] + npt[1]) / 2)
+                    parts.append(f"Q{pt[0]:.2f},{pt[1]:.2f} {mid[0]:.2f},{mid[1]:.2f}")
+                    i += 1
+        parts.append("Z")
+        s = ce + 1
+
+
+def _text_runs(faces, text):
+    """Split text into same-font runs; spaces and punctuation stay in the current run."""
+    runs = []
     for ch in text:
         face = _find_face(faces, ch)
+        if runs and (face is runs[-1][0] or not ch.isalpha()):
+            runs[-1][1] += ch
+        else:
+            runs.append([face, ch])
+    return runs
+
+
+def _shaped_font(face):
+    key = face.source_path
+    if key not in _HB_FONTS:
+        font = hb.Font(hb.Face(hb.Blob.from_file_path(key)))
+        font.scale = (FONT_SIZE * 64, FONT_SIZE * 64)
+        _HB_FONTS[key] = font
+    return _HB_FONTS[key]
+
+
+def _draw_plain(face, text, px, parts):
+    for ch in text:
         face.set_char_size(0, FONT_SIZE * 64, 72, 72)
         face.load_char(ch, freetype.FT_LOAD_NO_HINTING | freetype.FT_LOAD_NO_BITMAP)
-        o = face.glyph.outline
-        pts, tgs, ctrs = o.points, o.tags, o.contours
-        s = 0
-        for ce in ctrs:
-            cp = pts[s : ce + 1]
-            ct = tgs[s : ce + 1]
-            n = len(cp)
-            if n == 0:
-                s = ce + 1
-                continue
-
-            def tx(p):
-                return (px + p[0] / 64.0, Y_BASELINE - p[1] / 64.0)
-
-            fo = next((i for i in range(n) if ct[i] & 1), None)
-            if fo is None:
-                p0, p1 = tx(cp[0]), tx(cp[1])
-                parts.append(f"M{(p0[0]+p1[0])/2:.2f},{(p0[1]+p1[1])/2:.2f}")
-                fo = -1
-            else:
-                p = tx(cp[fo])
-                parts.append(f"M{p[0]:.2f},{p[1]:.2f}")
-            i = 0
-            while i < n:
-                ci = (fo + 1 + i) % n if fo >= 0 else i % n
-                pt = tx(cp[ci])
-                tag = ct[ci]
-                if tag & 1:
-                    parts.append(f"L{pt[0]:.2f},{pt[1]:.2f}")
-                    i += 1
-                else:
-                    ni = (ci + 1) % n
-                    npt = tx(cp[ni])
-                    ntag = ct[ni]
-                    if ntag & 1:
-                        parts.append(f"Q{pt[0]:.2f},{pt[1]:.2f} {npt[0]:.2f},{npt[1]:.2f}")
-                        i += 2
-                    else:
-                        mid = ((pt[0] + npt[0]) / 2, (pt[1] + npt[1]) / 2)
-                        parts.append(f"Q{pt[0]:.2f},{pt[1]:.2f} {mid[0]:.2f},{mid[1]:.2f}")
-                        i += 1
-            parts.append("Z")
-            s = ce + 1
+        _outline_path(face.glyph.outline, px, parts)
         px += face.glyph.advance.x / 64.0
+    return px
+
+
+def _draw_shaped(face, text, px, parts):
+    """Shape with HarfBuzz: joins Arabic letters, orders RTL runs, builds Indic clusters."""
+    buf = hb.Buffer()
+    buf.add_str(text)
+    buf.guess_segment_properties()
+    hb.shape(_shaped_font(face), buf)
+    face.set_char_size(0, FONT_SIZE * 64, 72, 72)
+    for info, pos in zip(buf.glyph_infos, buf.glyph_positions):
+        face.load_glyph(info.codepoint, freetype.FT_LOAD_NO_HINTING | freetype.FT_LOAD_NO_BITMAP)
+        _outline_path(face.glyph.outline, px + pos.x_offset / 64.0, parts)
+        px += pos.x_advance / 64.0
+    return px
+
+
+def _path_text(faces, text, x0=0):
+    runs = _text_runs(faces, text)
+    if any(unicodedata.bidirectional(ch) in ("R", "AL") for ch in text):
+        runs.reverse()
+    parts = []
+    px = x0
+    for face, run in runs:
+        draw = _draw_plain if face is faces[0] else _draw_shaped
+        px = draw(face, run, px, parts)
     return " ".join(parts), px - x0
 
 
@@ -247,16 +302,26 @@ def _get_label(audio_lang, app_locale):
 
 
 def main():
-    faces = _load_faces()
+    total = 0
+    for faces, suffix in [(_load_faces(), ""), (_load_faces(bold=True), "-bold")]:
+        total += _generate(faces, suffix)
+
+    print(f"Generated {total} vectorized language SVGs")
+    print(f"  Locales: {len(APP_LOCALES) + 1} (including ISO)")
+    print(f"  Languages per locale: {len(AUDIO_LANGS)}")
+    print(f"  Output: {OUTPUT_DIR}")
+
+
+def _generate(faces, suffix):
     total = 0
 
     for app_dir, babel_str in sorted(APP_LOCALES.items()):
         # With speaker icon (player context)
-        vec_dir = os.path.join(OUTPUT_DIR, app_dir, "vectorized")
+        vec_dir = os.path.join(OUTPUT_DIR, app_dir, f"vectorized{suffix}")
         os.makedirs(vec_dir, exist_ok=True)
 
-        # Text only (source context)
-        text_dir = os.path.join(OUTPUT_DIR, app_dir, "text-only")
+        # Text only (source context, compact player)
+        text_dir = os.path.join(OUTPUT_DIR, app_dir, f"text-only{suffix}")
         os.makedirs(text_dir, exist_ok=True)
 
         for audio_lang in AUDIO_LANGS:
@@ -273,7 +338,7 @@ def main():
 
     # ISO variant
     for subdir, make_fn in [("vectorized", _make_svg), ("text-only", _make_text_svg)]:
-        iso_dir = os.path.join(OUTPUT_DIR, "iso", subdir)
+        iso_dir = os.path.join(OUTPUT_DIR, "iso", f"{subdir}{suffix}")
         os.makedirs(iso_dir, exist_ok=True)
         for audio_lang in AUDIO_LANGS:
             iso3 = AUDIO_TO_ISO3[audio_lang]
@@ -282,10 +347,7 @@ def main():
                 f.write(svg)
             total += 1
 
-    print(f"Generated {total} vectorized language SVGs")
-    print(f"  Locales: {len(APP_LOCALES) + 1} (including ISO)")
-    print(f"  Languages per locale: {len(AUDIO_LANGS)}")
-    print(f"  Output: {OUTPUT_DIR}")
+    return total
 
 
 if __name__ == "__main__":
