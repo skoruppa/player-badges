@@ -452,8 +452,8 @@ FILTER_DEFS = [
     ("p-webdl",  "src", "WebDL",  r"(?i)\b(?:web[-_. ]?dl|webdl|web(?![-_. ]?rip)\b)",    "source/webdl"),
     ("p-webrip", "src", "WebRip", r"(?i)^(?=.*\brip\b|.*\bweb[-_. ]?rip\b|.*\bhd[-_. ]?rip\b)(?!.*\b(?:bd|br)[-_. ]?rip\b)(?!.*\bdvd[-_. ]?rip\b)(?!.*\b(?:hd[-_. ]?)?tc[-_. ]?rip\b)(?!.*\b(?:hd[-_. ]?)?ts[-_. ]?rip\b)(?!.*\b(?:hd[-_. ]?)?cam[-_. ]?rip\b)", "source/webrip"),
     ("p-hdtv",   "src", "HDTV",   r"(?i)\b(?:hdtv|pdtv|sdtv|dsr)\b",                     "source/hdtv"),
-    ("p-dvdscr", "src", "DVDScr", r"(?i)\bdvd[\s._-]?scr(?:eener)?\b",                    "source/dvdscr"),
     ("p-dvdrip", "src", "DVDRip", r"(?i)^(?=.*\bdvd[\s._-]?rip\b)(?!.*\bdvd[\s._-]?scr)", "source/dvdrip"),
+    ("p-dvdscr", "src", "DVDScr", r"(?i)\bdvd[\s._-]?scr(?:eener)?\b",                    "source/dvdscr"),
     ("p-cam",    "src", "CAM",    r"(?i)^(?=.*(?:\b(?:hd[-_. ]?)?cam(?:[-_. ]?rip)?\b|\b(?:hd[-_. ]?)?ts(?:[-_. ]?rip)?\b|\btelesync\b|\bp(?:re[\s._-]?)?dvd(?:rip)?\b|\b(?:hd[-_. ]?)?tc(?:[-_. ]?rip)?\b|\btelecine\b|(?<!dvd)(?<!dvd[._-])\bscr(?:eener)?\b))(?!.*\bdvd[\s._-]?scr)", "source/cam"),
     ("p-r5",     "src", "R5",     r"(?i)\br5\b",                                          "source/r5"),
     # Special
