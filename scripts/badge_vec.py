@@ -43,6 +43,11 @@ DD_ICON = '''<g transform="translate({x}, 3)">
     <path d="M11,0 L8.8,0 A3.0,4.0 0 0 0 8.8,8 L11,8 Z" fill="white"/>
   </g>'''
 
+# Official Dolby mark: solid box with the double-D knocked out, lighter next to text
+DD_BOX_ICON = '''<g transform="translate({x}, 3)">
+    <path d="M0,0 H11 V8 H0 Z M0.9,0.9 H2.6 A2.65,3.1 0 0 1 2.6,7.1 H0.9 Z M10.1,0.9 H8.4 A2.65,3.1 0 0 0 8.4,7.1 H10.1 Z" fill="white" fill-rule="evenodd"/>
+  </g>'''
+
 SPEAKER_ICON = '''<g transform="translate({x}, 2)">
     <path d="M0.6,3.6 L0.6,6.2 L2.1,6.2 L4.3,8.2 L4.3,1.5 L2.1,3.6 Z" fill="white" stroke="white" stroke-width="0.25" stroke-linejoin="round"/>
     <path d="M6.2,3.2 A2.1,2.1 0 0 1 6.2,6.8" fill="none" stroke="white" stroke-width="1.0" stroke-linecap="round"/>
@@ -295,7 +300,7 @@ ICON_MAP = {
 def vectorize_badge(badge_id, base_dir=None, bold=False, compact=False):
     """Generate vectorized SVG content for a static badge. Returns SVG string or None.
 
-    bold swaps the text font, compact drops icons and shortens Dolby to mark + label.
+    bold swaps the text font, compact drops icons and shortens Dolby to the boxed mark + label.
     Logos ("raw", "imax") have no variants.
     """
     if base_dir is None:
@@ -316,7 +321,7 @@ def vectorize_badge(badge_id, base_dir=None, bold=False, compact=False):
     elif vec_type == "dolby":
         if not compact:
             return vec_dolby(vec_args[0], vec_args[1], font)
-        return vec_icon_text(vec_args[2], DD_ICON, DD_ICON_W, DD_GAP, font)
+        return vec_icon_text(vec_args[2], DD_BOX_ICON, DD_ICON_W, DD_GAP, font)
     elif vec_type == "icon_text":
         label, icon_type = vec_args
         if compact:

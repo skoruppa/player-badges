@@ -67,7 +67,7 @@ player-badges/
 - **ViewBox**: 14px height, variable width
 - **Font**: Roboto Medium (9px), vectorized as `<path>` curves (font-independent, works on all platforms including iOS)
 - **Non-Latin scripts**: Noto Sans fallback chain (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek)
-- **Dolby**: DD logo with the full name; compact keeps the logo with a short uppercase label (VISION, ATMOS, DIGITAL+)
+- **Dolby**: DD logo with the full name; compact uses the boxed Dolby mark with a short uppercase label (VISION, ATMOS, DIGITAL+)
 - **Variants**: Fragments carry `images` (`bold`, `compact`, `boldCompact`); the worker swaps one into `imageURL`
 - **Icons**: Inline SVG shapes (Dolby DD logo, speaker with waves, disc, globe, TV, camera, IMAX logo)
 - **Colors**: White fill on transparent background
@@ -95,7 +95,7 @@ GET /v1/badge.json?l=en&g=res,hdr&x=p-480p,p-hlg&go=hdr,res
 | `o.{gid}` | Badge order within group (e.g. `o.lang=s-pol,s-eng`) | — |
 | `s` | Style: `bordered`, `filled`, `none` | `filled` |
 | `b` | Bold text (`1`); logos stay unchanged | off |
-| `cp` | Compact: no icons, Dolby as logo + short label (`1`) | off |
+| `cp` | Compact: no icons, Dolby as boxed mark + short label (`1`) | off |
 | `tc` | Tag color (#AARRGGBB) | `#00000000` |
 | `bc` | Border color (#AARRGGBB) | `#FFFFFFFF` |
 
