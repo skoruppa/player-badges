@@ -41,7 +41,7 @@ echo "  $(find "$DEPLOY_DIR" -type f | wc -l) files"
 # ── Deploy to Cloudflare Pages ──────────────────────────────────────────────
 
 echo "🚀 Deploying to Pages..."
-wrangler pages deploy "$DEPLOY_DIR" --project-name "$PAGES_PROJECT"
+wrangler pages deploy "$DEPLOY_DIR" --project-name "$PAGES_PROJECT" --branch main
 
 # ── Cleanup ─────────────────────────────────────────────────────────────────
 
