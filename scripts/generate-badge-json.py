@@ -356,7 +356,7 @@ AUDIO_TEXT = [
     ("DTS", "dts"), ("FLAC", "flac"), ("Opus", "opus"), ("AAC", "aac"), ("AC-4", "ac4"),
 ]
 
-CHANNELS = ["7.1", "5.1", "2.0", "1.0"]
+CHANNELS = ["7.1", "6.1", "5.1", "2.0", "1.0"]
 
 # Source type badges (icon + text, matched against filename)
 SOURCE_DISC = [  # disc icon
@@ -443,12 +443,13 @@ FILTER_DEFS = [
     ("p-ac4",     "aud", "AC-4",           r"(?i)\b(AC-?4|AC4)\b",                                             "audio/ac4"),
     # Channels
     ("p-71", "ch", "7.1", r"(?i)\b7\.1\b", "channels/7.1"),
+    ("p-61", "ch", "6.1", r"(?i)\b6\.1\b", "channels/6.1"),
     ("p-51", "ch", "5.1", r"(?i)\b5\.1\b", "channels/5.1"),
     ("p-20", "ch", "2.0", r"(?i)\b2\.0\b", "channels/2.0"),
     ("p-10", "ch", "1.0", r"(?i)\b1\.0\b", "channels/1.0"),
     # Source (matched against filename) - patterns from nuvio-minimalist-badges
     ("p-remux",  "src", "Remux",  r"(?i)\b(?:bd|uhd)?remux\b",                            "source/remux"),
-    ("p-bluray", "src", "BluRay", r"(?i)^(?=.*(?:bluray|blu-ray|\bb[dr][-_. ]?rip\b|\bbd(?:25|50|r|mv)?\b))(?!.*\b(?:bd|uhd)?remux\b)",  "source/bluray"),
+    ("p-bluray", "src", "BluRay", r"(?i)^(?=.*(?:blu[-_. ]?ray|\bb[dr][-_. ]?rip\b|\bbd(?:25|50|r|mv)?\b))(?!.*\b(?:bd|uhd)?remux\b)",  "source/bluray"),
     ("p-webdl",  "src", "WebDL",  r"(?i)\b(?:web[-_. ]?dl|webdl|web(?![-_. ]?rip)\b)",    "source/webdl"),
     ("p-webrip", "src", "WebRip", r"(?i)^(?=.*\brip\b|.*\bweb[-_. ]?rip\b|.*\bhd[-_. ]?rip\b)(?!.*\b(?:bd|br)[-_. ]?rip\b)(?!.*\bdvd[-_. ]?rip\b)(?!.*\b(?:hd[-_. ]?)?tc[-_. ]?rip\b)(?!.*\b(?:hd[-_. ]?)?ts[-_. ]?rip\b)(?!.*\b(?:hd[-_. ]?)?cam[-_. ]?rip\b)", "source/webrip"),
     ("p-hdtv",   "src", "HDTV",   r"(?i)\b(?:hdtv|pdtv|sdtv|dsr)\b",                     "source/hdtv"),
@@ -459,7 +460,7 @@ FILTER_DEFS = [
     # Special
     ("p-imax-e", "spc", "IMAX Enhanced", r"(?i)\bimax[\s._-]?enhanced\b",                 "special/imax-enhanced"),
     ("p-imax",   "spc", "IMAX",   r"(?i)^(?=.*\bIMAX\b)(?!.*enhanced)",                   "special/imax"),
-    ("p-seadex", "spc", "SeaDex", r"(?i)\b(?:seadex|best[\s._-]?release|alt[\s._-]?(?:best[\s._-]?)?release)\b|\u200b\u200c\u200d", "special/seadex"),
+    ("p-seadex", "spc", "SeaDex", r"(?i)\b(?:seadex|best[\s._-]?release|alt[\s._-]?(?:best[\s._-]?)?release)\b|\u200b\u200c\u200d|ᴀʟᴛ\s+ʀᴇʟᴇᴀsᴇ|ʙᴇsᴛ\s+ʀᴇʟᴇᴀsᴇ", "special/seadex"),
 ]
 
 

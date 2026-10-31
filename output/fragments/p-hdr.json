@@ -8,5 +8,6 @@
   "tagColor": "#00000000",
   "tagStyle": "filled",
   "textColor": "#FFFFFF",
-  "borderColor": "#FFFFFFFF"
+  "borderColor": "#FFFFFFFF",
+  "sourcePattern": "(?i)\\bHDR\\b(?![\\s._-]?10(?:P|plus)?(?![a-z0-9]|[\\s._-]?bit\\b))"
 }

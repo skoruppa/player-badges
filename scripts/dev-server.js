@@ -35,11 +35,16 @@ const GROUPS = [
   { id: "lang", name: "Language", isExpanded: true },
 ];
 
+const GROUP_ORDER = {
+  player: ["res", "hdr", "aud", "ch", "lang", "src", "spc"],
+  source: ["res", "src", "hdr", "aud", "ch", "spc", "lang"],
+};
+
 const GROUP_FILTERS = {
   res: ["p-8k", "p-4k", "p-1440p", "p-1080p", "p-720p", "p-480p"],
   hdr: ["p-dv", "p-hdr10p", "p-hdr10", "p-hlg", "p-hdr"],
   aud: ["p-atmos", "p-truehd", "p-ddp", "p-dd", "p-dtsx", "p-dtshdma", "p-dtshd", "p-dts", "p-flac", "p-opus", "p-aac", "p-ac4"],
-  ch: ["p-71", "p-51", "p-20", "p-10"],
+  ch: ["p-71", "p-61", "p-51", "p-20", "p-10"],
   src: ["p-remux", "p-bluray", "p-webdl", "p-webrip", "p-hdtv", "p-dvdrip", "p-dvdscr", "p-cam", "p-r5"],
   spc: ["p-imax-e", "p-imax", "p-seadex"],
   lang: [
@@ -66,22 +71,24 @@ const ALL_LANG_IDS = new Set([...GROUP_FILTERS.lang, ...SOURCE_LANG_FILTERS]);
 function handleBadgeApi(query) {
   const locale = query.l || 'en';
   const context = query.c || 'player';
-  const groupsParam = query.g || 'res,hdr,aud,ch,src,spc,lang';
+  const defaultOrder = GROUP_ORDER[context] || GROUP_ORDER.player;
+  const groupsParam = query.g || defaultOrder.join(',');
   const excludeParam = query.x || '';
   const groupOrderParam = query.go || '';
   const style = query.s || 'bordered';
   const tc = decodeURIComponent(query.tc || '#00000000');
   const bc = decodeURIComponent(query.bc || '#FFFFFFFF');
 
+  const requestedGroups = new Set(groupsParam.split(',').map(s => s.trim()));
+
   // Group order
   let orderedGroups;
   if (groupOrderParam) {
     orderedGroups = groupOrderParam.split(',').map(s => s.trim());
   } else {
-    orderedGroups = groupsParam.split(',').map(s => s.trim());
+    orderedGroups = defaultOrder.filter(gid => requestedGroups.has(gid));
   }
 
-  const requestedGroups = new Set(groupsParam.split(',').map(s => s.trim()));
   const excludeSet = excludeParam ? new Set(excludeParam.split(',').map(s => s.trim())) : new Set();
 
   // Per-group badge order overrides: o.res=p-4k,p-1080p
@@ -122,6 +129,8 @@ function handleBadgeApi(query) {
 
     try {
       const data = JSON.parse(fs.readFileSync(fragPath, 'utf-8'));
+      if (context === 'source' && data.sourcePattern) data.pattern = data.sourcePattern;
+      delete data.sourcePattern;
       data.tagStyle = style;
       data.tagColor = tc;
       data.borderColor = bc;

@@ -31,12 +31,18 @@ const GROUPS = [
   { id: "lang", name: "Language", isExpanded: true },
 ];
 
+// Default group display order per context
+const GROUP_ORDER = {
+  player: ["res", "hdr", "aud", "ch", "lang", "src", "spc"],
+  source: ["res", "src", "hdr", "aud", "ch", "spc", "lang"],
+};
+
 // Map group -> ordered list of filter IDs (player context)
 const GROUP_FILTERS = {
   res: ["p-8k", "p-4k", "p-1440p", "p-1080p", "p-720p", "p-480p"],
   hdr: ["p-dv", "p-hdr10p", "p-hdr10", "p-hlg", "p-hdr"],
   aud: ["p-atmos", "p-truehd", "p-ddp", "p-dd", "p-dtsx", "p-dtshdma", "p-dtshd", "p-dts", "p-flac", "p-opus", "p-aac", "p-ac4"],
-  ch: ["p-71", "p-51", "p-20", "p-10"],
+  ch: ["p-71", "p-61", "p-51", "p-20", "p-10"],
   src: ["p-remux", "p-bluray", "p-webdl", "p-webrip", "p-hdtv", "p-dvdrip", "p-dvdscr", "p-cam", "p-r5"],
   spc: ["p-imax-e", "p-imax", "p-seadex"],
   lang: [
@@ -74,7 +80,7 @@ const PRESETS = {
       'p-atmos': '#999999', 'p-truehd': '#999999', 'p-ddp': '#888888', 'p-dd': '#888888',
       'p-dtsx': '#999999', 'p-dtshdma': '#999999', 'p-dtshd': '#888888', 'p-dts': '#888888',
       'p-flac': '#888888', 'p-opus': '#888888', 'p-aac': '#777777', 'p-ac4': '#777777',
-      'p-71': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
+      'p-71': '#888888', 'p-61': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
     }
   },
   neon: {
@@ -136,7 +142,8 @@ export default {
     // Parse params
     const locale = url.searchParams.get("l") || "en";
     const context = url.searchParams.get("c") || "player";
-    const groupsParam = url.searchParams.get("g") || "res,hdr,aud,ch,src,spc,lang";
+    const defaultOrder = GROUP_ORDER[context] || GROUP_ORDER.player;
+    const groupsParam = url.searchParams.get("g") || defaultOrder.join(",");
     const excludeParam = url.searchParams.get("x");
     const groupOrderParam = url.searchParams.get("go");
     const style = url.searchParams.get("s") || "bordered";
@@ -155,15 +162,16 @@ export default {
       effectiveFilters.lang = SOURCE_LANG_FILTERS;
     }
 
-    // Determine group order: go= overrides default
+    const requestedGroups = new Set(groupsParam.split(",").map(s => s.trim()));
+
+    // Determine group order: go= overrides the context default
     let orderedGroups;
     if (groupOrderParam) {
       orderedGroups = groupOrderParam.split(",").map(s => s.trim());
     } else {
-      orderedGroups = groupsParam.split(",").map(s => s.trim());
+      orderedGroups = defaultOrder.filter(gid => requestedGroups.has(gid));
     }
 
-    const requestedGroups = new Set(groupsParam.split(",").map(s => s.trim()));
     const excludeSet = excludeParam ? new Set(excludeParam.split(",").map(s => s.trim())) : new Set();
 
     // Per-group badge order overrides: o.res=p-4k,p-1080p
@@ -200,6 +208,10 @@ export default {
 
       const data = await env.BADGE_FRAGMENTS.get(kvKey, "json");
       if (!data) continue;
+
+      // Source context reports every tag found, not one per group
+      if (context === "source" && data.sourcePattern) data.pattern = data.sourcePattern;
+      delete data.sourcePattern;
 
       // Apply style overrides
       const badgeColor = presetBadgeColors[id];

@@ -37,6 +37,12 @@ GROUPS = [
     {"id": "lang", "name": "Language",      "isExpanded": True},
 ]
 
+# Default display order per context (mirrors GROUP_ORDER in worker/index.js)
+GROUP_ORDER = {
+    "player": ["res", "hdr", "aud", "ch", "lang", "src", "spc"],
+    "source": ["res", "src", "hdr", "aud", "ch", "spc", "lang"],
+}
+
 BADGE_STYLE = {
     "isEnabled": True,
     "tagColor": "#00000000",
@@ -77,12 +83,13 @@ FILTERS = [
     ("p-ac4",     "aud", "AC-4",           r"(?i)\b(AC-?4|AC4)\b", "audio/ac4.svg"),
     # Channels
     ("p-71", "ch", "7.1", r"(?i)\b7\.1\b", "channels/7.1.svg"),
+    ("p-61", "ch", "6.1", r"(?i)\b6\.1\b", "channels/6.1.svg"),
     ("p-51", "ch", "5.1", r"(?i)\b5\.1\b", "channels/5.1.svg"),
     ("p-20", "ch", "2.0", r"(?i)\b2\.0\b", "channels/2.0.svg"),
     ("p-10", "ch", "1.0", r"(?i)\b1\.0\b", "channels/1.0.svg"),
     # Source
     ("p-remux",  "src", "Remux",  r"(?i)\b(?:bd|uhd)?remux\b", "source/remux.svg"),
-    ("p-bluray", "src", "BluRay", r"(?i)^(?=.*(?:bluray|blu-ray|\bb[dr][-_. ]?rip\b|\bbd(?:25|50|r|mv)?\b))(?!.*\b(?:bd|uhd)?remux\b)", "source/bluray.svg"),
+    ("p-bluray", "src", "BluRay", r"(?i)^(?=.*(?:blu[-_. ]?ray|\bb[dr][-_. ]?rip\b|\bbd(?:25|50|r|mv)?\b))(?!.*\b(?:bd|uhd)?remux\b)", "source/bluray.svg"),
     ("p-webdl",  "src", "WebDL",  r"(?i)\b(?:web[-_. ]?dl|webdl|web(?![-_. ]?rip)\b)", "source/webdl.svg"),
     ("p-webrip", "src", "WebRip", r"(?i)^(?=.*\brip\b|.*\bweb[-_. ]?rip\b|.*\bhd[-_. ]?rip\b)(?!.*\b(?:bd|br)[-_. ]?rip\b)(?!.*\bdvd[-_. ]?rip\b)(?!.*\b(?:hd[-_. ]?)?tc[-_. ]?rip\b)(?!.*\b(?:hd[-_. ]?)?ts[-_. ]?rip\b)(?!.*\b(?:hd[-_. ]?)?cam[-_. ]?rip\b)", "source/webrip.svg"),
     ("p-hdtv",   "src", "HDTV",   r"(?i)\b(?:hdtv|pdtv|sdtv|dsr)\b", "source/hdtv.svg"),
@@ -93,8 +100,51 @@ FILTERS = [
     # Special
     ("p-imax-e", "spc", "IMAX Enhanced", r"(?i)\bimax[\s._-]?enhanced\b", "special/imax-enhanced.svg"),
     ("p-imax",   "spc", "IMAX",   r"(?i)^(?=.*\bIMAX\b)(?!.*enhanced)", "special/imax.svg"),
-    ("p-seadex", "spc", "SeaDex", r"(?i)\b(?:seadex|best[\s._-]?release|alt[\s._-]?(?:best[\s._-]?)?release)\b|\u200b\u200c\u200d", "special/seadex.svg"),
+    ("p-seadex", "spc", "SeaDex", r"(?i)\b(?:seadex|best[\s._-]?release|alt[\s._-]?(?:best[\s._-]?)?release)\b|\u200b\u200c\u200d|ᴀʟᴛ\s+ʀᴇʟᴇᴀsᴇ|ʙᴇsᴛ\s+ʀᴇʟᴇᴀsᴇ", "special/seadex.svg"),
 ]
+
+# Source context overrides: filenames can list several formats at once, so every tag found
+# gets its own badge. Lookarounds only tell apart tokens sharing a prefix (DTS vs DTS-HD),
+# they never exclude another format. Codec tags use (?<![a-z0-9])...(?![a-z]) instead of \b
+# because channels are often glued on (DDP5.1, AAC2.0).
+# Filters not listed here use the same pattern in both contexts.
+SOURCE_PATTERNS = {
+    # Resolution: UHD alone says nothing about pixels (1080p UHD BluRay exists)
+    "p-4k":      r"(?i)\b(?:2160p?|4k)\b|^(?!.*\b(?:1080|720)p?\b).*\b(?:uhd|ultra[ ._-]?hd)\b",
+    "p-1080p":   r"(?i)\b(?:1080p?|fhd|full[ ._-]?hd)\b",
+    "p-720p":    r"(?i)\b720p?\b",
+    # HDR: "10bit" after HDR is bit depth, not HDR10
+    "p-dv":      r"(?i)\b(DV|DoVi|Dolby[\s._-]?Vision)\b",
+    "p-hdr10p":  r"(?i)\bHDR[\s._-]?10(?:\+|P(?![a-z0-9])|[\s._-]?plus\b)",
+    "p-hdr10":   r"(?i)\bHDR[\s._-]?10(?![a-z0-9+]|[\s._-]?(?:plus|bit)\b)",
+    "p-hlg":     r"(?i)\bHLG\b",
+    "p-hdr":     r"(?i)\bHDR\b(?![\s._-]?10(?:P|plus)?(?![a-z0-9]|[\s._-]?bit\b))",
+    # Audio
+    "p-atmos":   r"(?i)\bAtmos\b|(?<![a-z0-9])DDPA(?![a-z])",
+    "p-truehd":  r"(?i)(?<![a-z0-9])True[\s._-]?HD(?![a-z])",
+    "p-ddp":     r"(?i)(?<![a-z0-9])(?:DD\+|DDPA?|E-?AC-?3|Dolby[\s._-]?Digital[\s._-]?Plus)(?![a-z])",
+    "p-dd":      r"(?i)(?<![a-z0-9])(?:DD(?![a-z+])|(?<!E-)AC-?3(?![a-z])|Dolby[\s._-]?Digital(?![\s._-]?Plus)(?![a-z]))",
+    "p-dtsx":    r"(?i)(?<![a-z0-9])DTS[\s._:-]?X(?![a-z0-9])",
+    "p-dtshdma": r"(?i)(?<![a-z0-9])DTS[\s._-]?HD[\s._-]?(?:MA(?![a-z])|Master\b)",
+    "p-dtshd":   r"(?i)(?<![a-z0-9])DTS[\s._-]?HD(?![a-z]|[\s._-]?(?:MA(?![a-z])|Master\b))",
+    "p-dts":     r"(?i)(?<![a-z0-9])DTS(?![a-z]|[\s._:-]?(?:HD|X(?![a-z0-9])))",
+    "p-flac":    r"(?i)(?<![a-z0-9])FLAC(?![a-z])",
+    "p-opus":    r"(?i)(?<![a-z0-9])Opus(?![a-z])",
+    "p-aac":     r"(?i)(?<![a-z0-9])AAC(?![a-z])",
+    "p-ac4":     r"(?i)(?<![a-z0-9])AC-?4(?![a-z0-9])",
+    # Channels: no \b (DDP5.1), and skip file sizes and bitrates from descriptions (5.1 GB)
+    "p-71":      r"(?i)(?<!\d)7\.1(?!\d|\s*[kmgt]i?b)",
+    "p-61":      r"(?i)(?<!\d)6\.1(?!\d|\s*[kmgt]i?b)",
+    "p-51":      r"(?i)(?<!\d)5\.1(?!\d|\s*[kmgt]i?b)",
+    "p-20":      r"(?i)(?<!\d)2\.0(?!\d|\s*[kmgt]i?b)",
+    "p-10":      r"(?i)(?<!\d)1\.0(?!\d|\s*[kmgt]i?b)",
+    # Source: Remux stays exclusive with BluRay, a remux is one source type, not two tags
+    "p-webrip": r"(?i)\b(?:web|hd)[-_. ]?rip\b|(?<!bd[-_. ])(?<!br[-_. ])(?<!dvd[-_. ])(?<!tc[-_. ])(?<!ts[-_. ])(?<!cam[-_. ])\brip\b",
+    "p-dvdrip":  r"(?i)\bdvd[\s._-]?rip\b",
+    "p-cam":     r"(?i)\b(?:hd[-_. ]?)?cam(?:[-_. ]?rip)?\b|\b(?:hd[-_. ]?)?ts(?:[-_. ]?rip)?\b|\btelesync\b|\bp(?:re[\s._-]?)?dvd(?:rip)?\b|\b(?:hd[-_. ]?)?tc(?:[-_. ]?rip)?\b|\btelecine\b|(?<!dvd)(?<!dvd[-_. ])\bscr(?:eener)?\b",
+    # Special
+    "p-imax":    r"(?i)\bIMAX\b(?![\s._-]?enhanced)",
+}
 
 # Language filters use locale-dependent SVGs
 # Player context: speaker icon, matches playbackMatchText tokens (space-bounded)
@@ -223,6 +273,8 @@ def main():
             "imageURL": image_url,
             **BADGE_STYLE,
         }
+        if fid in SOURCE_PATTERNS:
+            fragment["sourcePattern"] = SOURCE_PATTERNS[fid]
         with open(os.path.join(FRAGMENTS_DIR, f"{fid}.json"), "w") as f:
             json.dump(fragment, f, indent=2)
 
@@ -315,6 +367,7 @@ def main():
     manifest = {
         "version": 1,
         "groups": GROUPS,
+        "groupOrder": GROUP_ORDER,
         "filters": manifest_filters,
         "availableLocales": AVAILABLE_LOCALES,
         "style": BADGE_STYLE,

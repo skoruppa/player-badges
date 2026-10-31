@@ -38,7 +38,7 @@ const PRESETS = {
       'p-atmos': '#999999', 'p-truehd': '#999999', 'p-ddp': '#888888', 'p-dd': '#888888',
       'p-dtsx': '#999999', 'p-dtshdma': '#999999', 'p-dtshd': '#888888', 'p-dts': '#888888',
       'p-flac': '#888888', 'p-opus': '#888888', 'p-aac': '#777777', 'p-ac4': '#777777',
-      'p-71': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
+      'p-71': '#888888', 'p-61': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
     }
   },
   neon: {
@@ -129,6 +129,14 @@ const STORAGE_KEY = 'nuvio-badge-editor';
 
 function saveState() {
   try {
+    // Keep only manual reorders, per context, so default order changes still reach users
+    const context = getContext();
+    const groupOrders = loadState()?.groupOrders || {};
+    if (groupOrder.join() === manifest.groupOrder[context].join()) {
+      delete groupOrders[context];
+    } else {
+      groupOrders[context] = groupOrder;
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       locale: document.getElementById('locale-select')?.value,
       context: getContext(),
@@ -140,7 +148,7 @@ function saveState() {
       iconColor,
       activePreset,
       selectedBadges: [...selectedBadges],
-      groupOrder,
+      groupOrders,
     }));
   } catch {}
 }
@@ -427,13 +435,14 @@ async function loadBadges(forceSelectAll = false) {
   const previousSelected = forceSelectAll ? new Set() : new Set(selectedBadges);
   fragments = {};
   selectedBadges.clear();
-  groupOrder = manifest.groups.map(g => g.id);
+  groupOrder = [...manifest.groupOrder[context]];
   badgeOrder = {};
 
   // Restore group order if saved
-  if (saved?.groupOrder) {
-    const savedSet = new Set(saved.groupOrder);
-    const validOrder = saved.groupOrder.filter(gid => manifest.groups.some(g => g.id === gid));
+  const savedOrder = saved?.groupOrders?.[context];
+  if (savedOrder) {
+    const savedSet = new Set(savedOrder);
+    const validOrder = savedOrder.filter(gid => manifest.groups.some(g => g.id === gid));
     const missing = groupOrder.filter(gid => !savedSet.has(gid));
     groupOrder = [...validOrder, ...missing];
   }
@@ -798,7 +807,7 @@ function updatePreview() {
   }
 
   // go= group order (only when reordered from manifest default)
-  const defaultGroupOrder = manifest.groups.map(g => g.id)
+  const defaultGroupOrder = manifest.groupOrder[context]
     .filter(gid => activeGroupIds.includes(gid));
   if (activeGroupIds.join(',') !== defaultGroupOrder.join(',')) {
     params += `&go=${activeGroupIds.join(',')}`;

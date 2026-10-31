@@ -13,6 +13,8 @@ Badges matched against decoder info + filename. Language badges have speaker ico
 ### Source context (`s-` prefix)
 Badges matched against stream filename/title. Language badges are text-only (no speaker icon) with word-boundary regex + script detection (e.g. `[가-힯]{3,}` for Korean characters in filename).
 
+Non-language badges share `p-` IDs and SVGs with the player context, but every tag found gets its own badge (e.g. Dolby Vision + HDR10+, TrueHD + Atmos). The worker swaps `pattern` for `sourcePattern` when `c=source`; overrides live in `SOURCE_PATTERNS` in `generate-manifest.py`.
+
 ## Directory structure
 
 ```
@@ -21,7 +23,7 @@ player-badges/
     resolution/              8K, 4K, 1440p, 1080p, 720p, 480p
     hdr/                     Dolby Vision, HDR10+, HDR10, HLG, HDR
     audio/                   Dolby Atmos/Digital+/Digital/TrueHD, DTS variants, FLAC, Opus, AAC, AC-4
-    channels/                7.1, 5.1, 2.0, 1.0
+    channels/                7.1, 6.1, 5.1, 2.0, 1.0
     source/                  Remux, BluRay, WebDL, WebRip, HDTV, DVDScr, DVDRip, CAM, R5
     special/                 IMAX, IMAX Enhanced, SeaDex
     language/<locale>/
@@ -81,9 +83,9 @@ GET /v1/badge.json?l=en&g=res,hdr&x=p-480p,p-hlg&go=hdr,res
 |---|---|---|
 | `l` | Locale (en, pl, de, ja, iso...) | `en` |
 | `c` | Context: `player` or `source` | `player` |
-| `g` | Group IDs to include (comma-separated) | `res,hdr,aud,ch,lang` |
+| `g` | Group IDs to include (comma-separated) | all groups |
 | `x` | Badge IDs to exclude | — |
-| `go` | Group display order (when reordered) | — |
+| `go` | Group display order (when reordered) | player: `res,hdr,aud,ch,lang,src,spc`<br>source: `res,src,hdr,aud,ch,spc,lang` |
 | `o.{gid}` | Badge order within group (e.g. `o.lang=s-pol,s-eng`) | — |
 | `s` | Style: `bordered`, `filled`, `none` | `filled` |
 | `tc` | Tag color (#AARRGGBB) | `#00000000` |
@@ -101,7 +103,7 @@ GET /v1/badge.json?l=en&g=res,hdr&x=p-480p,p-hlg&go=hdr,res
 | `res` | Resolution | 8K, 4K, 1440p, 1080p, 720p, 480p |
 | `hdr` | HDR / Vision | Dolby Vision, HDR10+, HDR10, HLG, HDR |
 | `aud` | Audio Format | Atmos, TrueHD, DD+, DD, DTS:X, DTS-HD MA, DTS-HD, DTS, FLAC, Opus, AAC, AC-4 |
-| `ch` | Channels | 7.1, 5.1, 2.0, 1.0 |
+| `ch` | Channels | 7.1, 6.1, 5.1, 2.0, 1.0 |
 | `src` | Source | Remux, BluRay, WebDL, WebRip, HDTV, DVDScr, DVDRip, CAM, R5 |
 | `spc` | Special | IMAX Enhanced, IMAX, SeaDex |
 | `lang` | Language | 35 languages × 27 locales |

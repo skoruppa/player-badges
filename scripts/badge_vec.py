@@ -261,6 +261,7 @@ STATIC_BADGES = {
     "p-ac4":     ("audio/ac4.svg",     "text", ("AC-4",)),
 
     "p-71": ("channels/7.1.svg", "text", ("7.1",)),
+    "p-61": ("channels/6.1.svg", "text", ("6.1",)),
     "p-51": ("channels/5.1.svg", "text", ("5.1",)),
     "p-20": ("channels/2.0.svg", "text", ("2.0",)),
     "p-10": ("channels/1.0.svg", "text", ("1.0",)),

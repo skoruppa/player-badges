@@ -8,5 +8,6 @@
   "tagColor": "#00000000",
   "tagStyle": "filled",
   "textColor": "#FFFFFF",
-  "borderColor": "#FFFFFFFF"
+  "borderColor": "#FFFFFFFF",
+  "sourcePattern": "(?i)\\b(?:2160p?|4k)\\b|^(?!.*\\b(?:1080|720)p?\\b).*\\b(?:uhd|ultra[ ._-]?hd)\\b"
 }

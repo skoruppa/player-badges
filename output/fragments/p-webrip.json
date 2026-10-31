@@ -8,5 +8,6 @@
   "tagColor": "#00000000",
   "tagStyle": "filled",
   "textColor": "#FFFFFF",
-  "borderColor": "#FFFFFFFF"
+  "borderColor": "#FFFFFFFF",
+  "sourcePattern": "(?i)\\b(?:web|hd)[-_. ]?rip\\b|(?<!bd[-_. ])(?<!br[-_. ])(?<!dvd[-_. ])(?<!tc[-_. ])(?<!ts[-_. ])(?<!cam[-_. ])\\brip\\b"
 }
