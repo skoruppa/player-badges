@@ -90,6 +90,7 @@ export default {
     const style = url.searchParams.get("s") || "bordered";
     const tc = decodeURIComponent(url.searchParams.get("tc") || "#00000000");
     const bc = decodeURIComponent(url.searchParams.get("bc") || "#FFFFFFFF");
+    const ic = decodeURIComponent(url.searchParams.get("ic") || "#ffffff");
 
     // Build effective group filters map (swap lang based on context)
     const effectiveFilters = { ...GROUP_FILTERS };
@@ -147,6 +148,19 @@ export default {
       data.tagStyle = style;
       data.tagColor = tc;
       data.borderColor = bc;
+
+      // Recolor badge SVG if icon color is not white
+      if (ic !== '#ffffff' && ic !== '#FFFFFF' && data.imageURL) {
+        const svg = atob(data.imageURL.split(',')[1]);
+        const hex = ic.toLowerCase();
+        const recolored = svg
+          .replace(/fill="white"/g, `fill="${hex}"`)
+          .replace(/fill="#ffffff"/gi, `fill="${hex}"`)
+          .replace(/fill:#ffffff/gi, `fill:${hex}`)
+          .replace(/stroke="white"/g, `stroke="${hex}"`)
+          .replace(/stroke:#ffffff/gi, `stroke:${hex}`);
+        data.imageURL = 'data:image/svg+xml;base64,' + btoa(recolored);
+      }
 
       filters.push(data);
     }
