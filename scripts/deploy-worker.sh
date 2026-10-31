@@ -75,5 +75,11 @@ echo "✅ Worker deployed: https://nuvio-badges.skoruppa.workers.dev"
 echo ""
 echo "🧹 Purging edge cache..."
 sleep 5
-PURGE_KEY="REMOVED"
+if [[ -z "${PURGE_KEY:-}" && -f "$BASE_DIR/.env" ]]; then
+  source "$BASE_DIR/.env"
+fi
+if [[ -z "${PURGE_KEY:-}" ]]; then
+  echo "  ⚠ no purge key: set PURGE_KEY in .env"
+  exit 0
+fi
 curl -s -X POST "https://nuvio-badges.skoruppa.workers.dev/v1/purge?key=$PURGE_KEY" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'  ✓ {d}')" 2>/dev/null || echo "  ⚠ purge failed (try manually)"
