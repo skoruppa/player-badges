@@ -37,7 +37,7 @@ const GROUP_FILTERS = {
   hdr: ["p-dv", "p-hdr10p", "p-hdr10", "p-hlg", "p-hdr"],
   aud: ["p-atmos", "p-truehd", "p-ddp", "p-dd", "p-dtsx", "p-dtshdma", "p-dtshd", "p-dts", "p-flac", "p-opus", "p-aac", "p-ac4"],
   ch: ["p-71", "p-51", "p-20", "p-10"],
-  src: ["p-remux", "p-bluray", "p-webdl", "p-webrip", "p-hdtv", "p-dvdscr", "p-dvdrip", "p-cam", "p-r5"],
+  src: ["p-remux", "p-bluray", "p-webdl", "p-webrip", "p-hdtv", "p-dvdrip", "p-dvdscr", "p-cam", "p-r5"],
   spc: ["p-imax-e", "p-imax", "p-seadex"],
   lang: [
     "p-eng", "p-pol", "p-spa", "p-fre", "p-ger", "p-ita", "p-por", "p-por-br", "p-rus",
@@ -89,7 +89,7 @@ const PRESETS = {
   },
   gold: {
     bordered: { bc: '#FFd4a843', tc: '#00000000', ic: '#d4a843' },
-    filled: { bc: '#FFd4a843', tc: '#66d4a843', ic: '#d4a843' },
+    filled: { bc: '#FFd4a843', tc: '#26d4a843', ic: '#d4a843' },
     badgeColors: {}
   },
 };

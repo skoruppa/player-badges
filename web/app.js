@@ -31,7 +31,7 @@ const PRESETS = {
     filled: { borderColor: '#000000', borderOpacity: 0, fillColor: '#000000', fillOpacity: 80, iconColor: '#ffffff' },
     badgeColors: {
       'p-remux': '#ff6600', 'p-bluray': '#dd8800', 'p-webdl': '#ccaa00', 'p-webrip': '#ccaa00',
-      'p-hdtv': '#888888', 'p-dvdscr': '#666666', 'p-dvdrip': '#666666', 'p-cam': '#555555', 'p-r5': '#555555',
+      'p-hdtv': '#ccaa00', 'p-dvdrip': '#aa8800', 'p-dvdscr': '#666666', 'p-cam': '#555555', 'p-r5': '#555555',
       'p-8k': '#00ee55', 'p-4k': '#33cc44', 'p-1440p': '#55aa44', 'p-1080p': '#778844', 'p-720p': '#888855', 'p-480p': '#777766',
       'p-imax-e': '#ff3333', 'p-imax': '#ff3333', 'p-seadex': '#44ddaa',
       'p-dv': '#55aaff', 'p-hdr10p': '#55aaff', 'p-hdr10': '#55aaff', 'p-hlg': '#55aaff', 'p-hdr': '#55aaff',
@@ -56,7 +56,7 @@ const PRESETS = {
   gold: {
     name: 'Gold',
     bordered: { borderColor: '#d4a843', borderOpacity: 100, iconColor: '#d4a843' },
-    filled: { borderColor: '#d4a843', borderOpacity: 100, fillColor: '#d4a843', fillOpacity: 40, iconColor: '#d4a843' },
+    filled: { borderColor: '#d4a843', borderOpacity: 100, fillColor: '#d4a843', fillOpacity: 15, iconColor: '#d4a843' },
     badgeColors: {}
   },
 };
@@ -138,6 +138,7 @@ function saveState() {
       borderColor,
       borderOpacity,
       iconColor,
+      activePreset,
       selectedBadges: [...selectedBadges],
       groupOrder,
     }));
@@ -250,6 +251,7 @@ async function init() {
     document.getElementById('icon-color-picker').value = iconColor;
     document.getElementById('icon-color-hex').value = iconColor;
   }
+  // Preset restored after loadBadges (needs fragments loaded first)
 
   // Style pills
   document.querySelectorAll('#style-pills .pill').forEach(pill => {
@@ -408,7 +410,12 @@ async function init() {
     }
   });
 
-  loadBadges();
+  await loadBadges();
+
+  // Restore preset after badges are loaded
+  if (saved?.activePreset && saved.activePreset !== 'default') {
+    applyPreset(saved.activePreset);
+  }
 }
 
 // ── Load badges ────────────────────────────────────────────────────────────
