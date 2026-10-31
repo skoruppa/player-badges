@@ -147,6 +147,21 @@ input[type="color"] {
 }
 .reset-btn:hover { color: var(--accent); border-color: var(--accent); }
 
+.preset-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; justify-content: center; }
+.preset-pill {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.preset-pill:hover { border-color: #555; color: var(--text); }
+.preset-pill.active { border-color: var(--accent); color: var(--accent); background: rgba(74,158,255,0.1); }
+
+.color-controls-disabled { opacity: 0.35; pointer-events: none; }
+
 .context-cards {
   display: flex;
   gap: 8px;

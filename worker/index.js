@@ -60,6 +60,58 @@ const SOURCE_LANG_FILTERS = [
 // All lang filter IDs (for KV key lookup)
 const ALL_LANG_IDS = new Set([...GROUP_FILTERS.lang, ...SOURCE_LANG_FILTERS]);
 
+// Presets — per style variant colors + per-badge overrides
+const PRESETS = {
+  colorful: {
+    bordered: { bc: '#FFFFFFFF', tc: '#00000000', ic: '#ffffff' },
+    filled: { bc: '#00000000', tc: '#CC000000', ic: '#ffffff' },
+    badgeColors: {
+      'p-remux': '#ff6600', 'p-bluray': '#dd8800', 'p-webdl': '#ccaa00', 'p-webrip': '#ccaa00',
+      'p-hdtv': '#888888', 'p-dvdscr': '#666666', 'p-dvdrip': '#666666', 'p-cam': '#555555', 'p-r5': '#555555',
+      'p-8k': '#00ee55', 'p-4k': '#33cc44', 'p-1440p': '#55aa44', 'p-1080p': '#778844', 'p-720p': '#888855', 'p-480p': '#777766',
+      'p-imax-e': '#ff3333', 'p-imax': '#ff3333', 'p-seadex': '#44ddaa',
+      'p-dv': '#55aaff', 'p-hdr10p': '#55aaff', 'p-hdr10': '#55aaff', 'p-hlg': '#55aaff', 'p-hdr': '#55aaff',
+      'p-atmos': '#999999', 'p-truehd': '#999999', 'p-ddp': '#888888', 'p-dd': '#888888',
+      'p-dtsx': '#999999', 'p-dtshdma': '#999999', 'p-dtshd': '#888888', 'p-dts': '#888888',
+      'p-flac': '#888888', 'p-opus': '#888888', 'p-aac': '#777777', 'p-ac4': '#777777',
+      'p-71': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
+    }
+  },
+  neon: {
+    bordered: { bc: '#CC00ffcc', tc: '#00000000', ic: '#00ffcc' },
+    filled: { bc: '#0000ffcc', tc: '#CC003333', ic: '#00ffcc' },
+    badgeColors: {}
+  },
+  stealth: {
+    bordered: { bc: '#33ffffff', tc: '#00000000', ic: '#aaaaaa' },
+    filled: { bc: '#1Affffff', tc: '#1Affffff', ic: '#aaaaaa' },
+    badgeColors: {}
+  },
+  gold: {
+    bordered: { bc: '#FFd4a843', tc: '#00000000', ic: '#d4a843' },
+    filled: { bc: '#FFd4a843', tc: '#66d4a843', ic: '#d4a843' },
+    badgeColors: {}
+  },
+};
+
+function toArgb(hex, opacity) {
+  const alpha = Math.round(opacity * 2.55).toString(16).padStart(2, '0').toUpperCase();
+  return '#' + alpha + hex.replace('#', '').toUpperCase();
+}
+
+function recolorSvg(base64DataUri, color) {
+  if (color === '#ffffff' || color === '#FFFFFF') return base64DataUri;
+  const svg = atob(base64DataUri.split(',')[1]);
+  const hex = color.toLowerCase();
+  const r = svg
+    .replace(/fill="white"/g, `fill="${hex}"`)
+    .replace(/fill="#ffffff"/gi, `fill="${hex}"`)
+    .replace(/fill:#ffffff/gi, `fill:${hex}`)
+    .replace(/stroke="white"/g, `stroke="${hex}"`)
+    .replace(/stroke:#ffffff/gi, `stroke:${hex}`);
+  return 'data:image/svg+xml;base64,' + btoa(r);
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -88,9 +140,14 @@ export default {
     const excludeParam = url.searchParams.get("x");
     const groupOrderParam = url.searchParams.get("go");
     const style = url.searchParams.get("s") || "bordered";
-    const tc = decodeURIComponent(url.searchParams.get("tc") || "#00000000");
-    const bc = decodeURIComponent(url.searchParams.get("bc") || "#FFFFFFFF");
-    const ic = decodeURIComponent(url.searchParams.get("ic") || "#ffffff");
+    const presetName = url.searchParams.get("p");
+    const preset = presetName ? PRESETS[presetName] : null;
+    const presetVariant = preset ? (preset[style] || preset.bordered) : null;
+
+    const tc = presetVariant ? presetVariant.tc : decodeURIComponent(url.searchParams.get("tc") || "#00000000");
+    const bc = presetVariant ? presetVariant.bc : decodeURIComponent(url.searchParams.get("bc") || "#FFFFFFFF");
+    const ic = presetVariant ? presetVariant.ic : decodeURIComponent(url.searchParams.get("ic") || "#ffffff");
+    const presetBadgeColors = preset ? (preset.badgeColors || {}) : {};
 
     // Build effective group filters map (swap lang based on context)
     const effectiveFilters = { ...GROUP_FILTERS };
@@ -145,21 +202,19 @@ export default {
       if (!data) continue;
 
       // Apply style overrides
+      const badgeColor = presetBadgeColors[id];
       data.tagStyle = style;
-      data.tagColor = tc;
-      data.borderColor = bc;
+      if (badgeColor) {
+        data.borderColor = style === 'filled' ? toArgb(badgeColor, 80) : toArgb(badgeColor, 100);
+        data.tagColor = style === 'filled' ? toArgb(badgeColor, 80) : '#00000000';
+      } else {
+        data.tagColor = tc;
+        data.borderColor = bc;
+      }
 
-      // Recolor badge SVG if icon color is not white
+      // Recolor badge SVG
       if (ic !== '#ffffff' && ic !== '#FFFFFF' && data.imageURL) {
-        const svg = atob(data.imageURL.split(',')[1]);
-        const hex = ic.toLowerCase();
-        const recolored = svg
-          .replace(/fill="white"/g, `fill="${hex}"`)
-          .replace(/fill="#ffffff"/gi, `fill="${hex}"`)
-          .replace(/fill:#ffffff/gi, `fill:${hex}`)
-          .replace(/stroke="white"/g, `stroke="${hex}"`)
-          .replace(/stroke:#ffffff/gi, `stroke:${hex}`);
-        data.imageURL = 'data:image/svg+xml;base64,' + btoa(recolored);
+        data.imageURL = recolorSvg(data.imageURL, ic);
       }
 
       filters.push(data);
