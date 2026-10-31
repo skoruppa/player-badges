@@ -48,6 +48,7 @@ player-badges/
     update-badge-svg.py      Update individual badges after manual SVG edits
     dev-server.js            Local dev server (API + editor)
     deploy-worker.sh         Deploy API worker + KV upload
+    upload-kv.py             Upload changed fragments to KV
     deploy-pages.sh          Deploy web editor to Cloudflare Pages
     deploy-all.sh            Full pipeline (regenerate + deploy everything)
   web/
@@ -136,7 +137,8 @@ bash scripts/deploy-all.sh
 | `generate-manifest.py` | Generate manifest + fragments + bundles |
 | `update-badge-svg.py` | Update output after manual SVG edit (`--all` for all badges) |
 | `dev-server.js` | Local dev server: `node scripts/dev-server.js [port]` |
-| `deploy-worker.sh` | Upload KV + deploy worker (`--skip-kv` to skip KV) |
+| `deploy-worker.sh` | Upload changed KV entries + deploy worker (`--skip-kv` to skip KV, `--full` to upload everything) |
+| `upload-kv.py` | Upload only changed fragments, tracked in KV under `_deployed` (`--dry-run` to preview) |
 | `deploy-pages.sh` | Deploy web editor to Cloudflare Pages |
 | `deploy-all.sh` | Full pipeline: regenerate → KV → worker → Pages |
 
