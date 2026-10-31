@@ -17,6 +17,52 @@ let borderColor = '#ffffff';
 let borderOpacity = 100;
 let iconColor = '#ffffff';
 
+// Color presets — per-badge border colors
+const PRESETS = {
+  default: {
+    name: 'None',
+    bordered: { borderColor: '#ffffff', borderOpacity: 100, iconColor: '#ffffff' },
+    filled: { borderColor: '#ffffff', borderOpacity: 100, fillColor: '#000000', fillOpacity: 100, iconColor: '#ffffff' },
+    badgeColors: {}
+  },
+  colorful: {
+    name: 'Colorful',
+    bordered: { borderColor: '#ffffff', borderOpacity: 100, iconColor: '#ffffff' },
+    filled: { borderColor: '#000000', borderOpacity: 0, fillColor: '#000000', fillOpacity: 80, iconColor: '#ffffff' },
+    badgeColors: {
+      'p-remux': '#ff6600', 'p-bluray': '#dd8800', 'p-webdl': '#ccaa00', 'p-webrip': '#ccaa00',
+      'p-hdtv': '#888888', 'p-dvdscr': '#666666', 'p-dvdrip': '#666666', 'p-cam': '#555555', 'p-r5': '#555555',
+      'p-8k': '#00ee55', 'p-4k': '#33cc44', 'p-1440p': '#55aa44', 'p-1080p': '#778844', 'p-720p': '#888855', 'p-480p': '#777766',
+      'p-imax-e': '#ff3333', 'p-imax': '#ff3333', 'p-seadex': '#44ddaa',
+      'p-dv': '#55aaff', 'p-hdr10p': '#55aaff', 'p-hdr10': '#55aaff', 'p-hlg': '#55aaff', 'p-hdr': '#55aaff',
+      'p-atmos': '#999999', 'p-truehd': '#999999', 'p-ddp': '#888888', 'p-dd': '#888888',
+      'p-dtsx': '#999999', 'p-dtshdma': '#999999', 'p-dtshd': '#888888', 'p-dts': '#888888',
+      'p-flac': '#888888', 'p-opus': '#888888', 'p-aac': '#777777', 'p-ac4': '#777777',
+      'p-71': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
+    }
+  },
+  neon: {
+    name: 'Neon',
+    bordered: { borderColor: '#00ffcc', borderOpacity: 80, iconColor: '#00ffcc' },
+    filled: { borderColor: '#00ffcc', borderOpacity: 0, fillColor: '#003333', fillOpacity: 80, iconColor: '#00ffcc' },
+    badgeColors: {}
+  },
+  stealth: {
+    name: 'Stealth',
+    bordered: { borderColor: '#ffffff', borderOpacity: 20, iconColor: '#aaaaaa' },
+    filled: { borderColor: '#ffffff', borderOpacity: 10, fillColor: '#ffffff', fillOpacity: 10, iconColor: '#aaaaaa' },
+    badgeColors: {}
+  },
+  gold: {
+    name: 'Gold',
+    bordered: { borderColor: '#d4a843', borderOpacity: 100, iconColor: '#d4a843' },
+    filled: { borderColor: '#d4a843', borderOpacity: 100, fillColor: '#d4a843', fillOpacity: 40, iconColor: '#d4a843' },
+    badgeColors: {}
+  },
+};
+let activePreset = null;
+let badgeColors = {}; // badgeId → border hex color (per-badge override from preset)
+
 function getContext() {
   return document.querySelector('#context-cards .context-card.active')?.dataset.value || 'player';
 }
@@ -25,6 +71,40 @@ function getContext() {
 function toArgb(hex, opacity) {
   const alpha = Math.round(opacity * 2.55).toString(16).padStart(2, '0').toUpperCase();
   return '#' + alpha + hex.replace('#', '').toUpperCase();
+}
+
+function applyPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+  activePreset = key;
+  const variant = p[currentStyle] || p.bordered;
+  borderColor = variant.borderColor; borderOpacity = variant.borderOpacity;
+  fillColor = variant.fillColor || '#000000'; fillOpacity = variant.fillOpacity || 100;
+  iconColor = variant.iconColor;
+  badgeColors = { ...(p.badgeColors || {}) };
+
+  // Update UI controls (don't change style pill)
+  document.getElementById('border-color-picker').value = borderColor;
+  document.getElementById('border-color-hex').value = borderColor;
+  document.getElementById('border-opacity').value = borderOpacity;
+  document.getElementById('border-opacity-value').textContent = borderOpacity + '%';
+  document.getElementById('fill-color-picker').value = fillColor;
+  document.getElementById('fill-color-hex').value = fillColor;
+  document.getElementById('fill-opacity').value = fillOpacity;
+  document.getElementById('fill-opacity-value').textContent = fillOpacity + '%';
+  document.getElementById('icon-color-picker').value = iconColor;
+  document.getElementById('icon-color-hex').value = iconColor;
+
+  // Highlight active preset
+  document.querySelectorAll('.preset-pill').forEach(pill =>
+    pill.classList.toggle('active', pill.dataset.key === key)
+  );
+
+  // Disable manual color controls when preset defines per-badge colors
+  const hasCustomColors = Object.keys(p.badgeColors || {}).length > 0;
+  document.getElementById('color-controls').classList.toggle('color-controls-disabled', hasCustomColors);
+
+  updatePreview();
 }
 
 // Recolor SVG data URI: replace white fills/strokes with target color
@@ -179,12 +259,34 @@ async function init() {
         p.classList.toggle('active', p === pill)
       );
       document.getElementById('fill-row').classList.toggle('visible', currentStyle === 'filled');
-      updatePreview();
+      if (activePreset) applyPreset(activePreset);
+      else updatePreview();
     });
   });
 
+  // Presets
+  const presetRow = document.getElementById('preset-row');
+  for (const [key, preset] of Object.entries(PRESETS)) {
+    const pill = document.createElement('span');
+    pill.className = 'preset-pill' + (key === 'default' ? ' active' : '');
+    pill.textContent = preset.name;
+    pill.dataset.key = key;
+    pill.addEventListener('click', () => applyPreset(key));
+    presetRow.appendChild(pill);
+  }
+
   // Icon (badge content) color
+  function clearPreset() {
+    activePreset = 'default';
+    badgeColors = {};
+    document.querySelectorAll('.preset-pill').forEach(p =>
+      p.classList.toggle('active', p.dataset.key === 'default')
+    );
+    document.getElementById('color-controls').classList.remove('color-controls-disabled');
+  }
+
   document.getElementById('icon-color-picker').addEventListener('input', e => {
+    clearPreset();
     iconColor = e.target.value;
     document.getElementById('icon-color-hex').value = iconColor;
     updatePreview();
@@ -200,6 +302,7 @@ async function init() {
 
   // Border color + opacity
   document.getElementById('border-color-picker').addEventListener('input', e => {
+    clearPreset();
     borderColor = e.target.value;
     document.getElementById('border-color-hex').value = borderColor;
     updatePreview();
@@ -207,12 +310,14 @@ async function init() {
   document.getElementById('border-color-hex').addEventListener('input', e => {
     const v = e.target.value;
     if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+      clearPreset();
       borderColor = v;
       document.getElementById('border-color-picker').value = v;
       updatePreview();
     }
   });
   document.getElementById('border-opacity').addEventListener('input', e => {
+    clearPreset();
     borderOpacity = parseInt(e.target.value);
     document.getElementById('border-opacity-value').textContent = borderOpacity + '%';
     updatePreview();
@@ -220,6 +325,7 @@ async function init() {
 
   // Fill color + opacity
   document.getElementById('fill-color-picker').addEventListener('input', e => {
+    clearPreset();
     fillColor = e.target.value;
     document.getElementById('fill-color-hex').value = fillColor;
     updatePreview();
@@ -227,12 +333,14 @@ async function init() {
   document.getElementById('fill-color-hex').addEventListener('input', e => {
     const v = e.target.value;
     if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+      clearPreset();
       fillColor = v;
       document.getElementById('fill-color-picker').value = v;
       updatePreview();
     }
   });
   document.getElementById('fill-opacity').addEventListener('input', e => {
+    clearPreset();
     fillOpacity = parseInt(e.target.value);
     document.getElementById('fill-opacity-value').textContent = fillOpacity + '%';
     updatePreview();
@@ -247,6 +355,12 @@ async function init() {
     borderColor = '#ffffff'; borderOpacity = 100;
     fillColor = '#000000'; fillOpacity = 100;
     iconColor = '#ffffff';
+    badgeColors = {};
+    activePreset = 'default';
+    document.querySelectorAll('.preset-pill').forEach(p =>
+      p.classList.toggle('active', p.dataset.key === 'default')
+    );
+    document.getElementById('color-controls').classList.remove('color-controls-disabled');
     document.querySelectorAll('#style-pills .pill').forEach(p =>
       p.classList.toggle('active', p.dataset.value === currentStyle)
     );
@@ -563,13 +677,21 @@ function updatePreview() {
       const chip = document.createElement('div');
       chip.className = 'preview-chip';
 
-      const borderRgba = `rgba(${parseInt(borderColor.slice(1,3),16)},${parseInt(borderColor.slice(3,5),16)},${parseInt(borderColor.slice(5,7),16)},${borderOpacity/100})`;
+      const badgeBc = badgeColors[badgeId];
+      const borderRgba = (() => {
+        const bc = badgeBc || borderColor;
+        const bo = badgeBc ? 100 : borderOpacity;
+        return `rgba(${parseInt(bc.slice(1,3),16)},${parseInt(bc.slice(3,5),16)},${parseInt(bc.slice(5,7),16)},${bo/100})`;
+      })();
 
       if (currentStyle === 'bordered') {
         chip.style.background = 'transparent';
         chip.style.border = `1px solid ${borderRgba}`;
       } else {
-        const fillRgba = `rgba(${parseInt(fillColor.slice(1,3),16)},${parseInt(fillColor.slice(3,5),16)},${parseInt(fillColor.slice(5,7),16)},${fillOpacity/100})`;
+        // Filled: use badge color as fill too (if preset defines it)
+        const fc = badgeBc || fillColor;
+        const fo = badgeBc ? fillOpacity : fillOpacity;
+        const fillRgba = `rgba(${parseInt(fc.slice(1,3),16)},${parseInt(fc.slice(3,5),16)},${parseInt(fc.slice(5,7),16)},${fo/100})`;
         chip.style.background = fillRgba;
         chip.style.border = `1px solid ${borderRgba}`;
       }
@@ -580,8 +702,12 @@ function updatePreview() {
       previewContainer.appendChild(chip);
 
       // Build filter for JSON — #AARRGGBB format
-      const tagColorArgb = currentStyle === 'filled' ? toArgb(fillColor, fillOpacity) : '#00000000';
-      const borderColorArgb = toArgb(borderColor, borderOpacity);
+      const badgeBorderColor = badgeColors[badgeId] || borderColor;
+      const badgeBorderOpacity = badgeColors[badgeId] ? 100 : borderOpacity;
+      const tagColorArgb = currentStyle === 'filled'
+        ? toArgb(badgeColors[badgeId] || fillColor, fillOpacity)
+        : '#00000000';
+      const borderColorArgb = toArgb(badgeBorderColor, badgeBorderOpacity);
 
       filters.push({
         ...fragment,
@@ -642,20 +768,26 @@ function updatePreview() {
     params += `&x=${excluded.join(',')}`;
   }
 
-  // Style + colors as #AARRGGBB
+  // Style + colors
   if (currentStyle !== DEFAULT_STYLE) {
     params += `&s=${currentStyle}`;
   }
-  const tagColorArgb = currentStyle === 'filled' ? toArgb(fillColor, fillOpacity) : '#00000000';
-  const borderColorArgb = toArgb(borderColor, borderOpacity);
-  if (tagColorArgb !== '#00000000') {
-    params += `&tc=${encodeURIComponent(tagColorArgb)}`;
-  }
-  if (borderColorArgb !== '#FFFFFFFF') {
-    params += `&bc=${encodeURIComponent(borderColorArgb)}`;
-  }
-  if (iconColor !== '#ffffff') {
-    params += `&ic=${encodeURIComponent(iconColor)}`;
+  if (activePreset && activePreset !== 'default') {
+    // Preset URL — short, cacheable
+    params += `&p=${activePreset}`;
+  } else {
+    // Custom colors
+    const tagColorArgbUrl = currentStyle === 'filled' ? toArgb(fillColor, fillOpacity) : '#00000000';
+    const borderColorArgbUrl = toArgb(borderColor, borderOpacity);
+    if (tagColorArgbUrl !== '#00000000') {
+      params += `&tc=${encodeURIComponent(tagColorArgbUrl)}`;
+    }
+    if (borderColorArgbUrl !== '#FFFFFFFF') {
+      params += `&bc=${encodeURIComponent(borderColorArgbUrl)}`;
+    }
+    if (iconColor !== '#ffffff') {
+      params += `&ic=${encodeURIComponent(iconColor)}`;
+    }
   }
 
   // go= group order (only when reordered from manifest default)
