@@ -15,6 +15,7 @@ let fillColor = '#000000';
 let fillOpacity = 100;
 let borderColor = '#ffffff';
 let borderOpacity = 100;
+let iconColor = '#ffffff';
 
 function getContext() {
   return document.querySelector('#context-cards .context-card.active')?.dataset.value || 'player';
@@ -24,6 +25,22 @@ function getContext() {
 function toArgb(hex, opacity) {
   const alpha = Math.round(opacity * 2.55).toString(16).padStart(2, '0').toUpperCase();
   return '#' + alpha + hex.replace('#', '').toUpperCase();
+}
+
+// Recolor SVG data URI: replace white fills/strokes with target color
+function recolorDataUri(dataUri, color) {
+  if (color === '#ffffff' || color === '#FFFFFF') return dataUri;
+  const svg = atob(dataUri.split(',')[1]);
+  const hex = color.toLowerCase();
+  const recolored = svg
+    .replace(/fill="white"/g, `fill="${hex}"`)
+    .replace(/fill="#ffffff"/gi, `fill="${hex}"`)
+    .replace(/fill:#ffffff/gi, `fill:${hex}`)
+    .replace(/stroke="white"/g, `stroke="${hex}"`)
+    .replace(/stroke:#ffffff/gi, `stroke:${hex}`)
+    // Also handle fill-opacity on recolored elements
+    .replace(/fill="white"/g, `fill="${hex}"`);
+  return 'data:image/svg+xml;base64,' + btoa(recolored);
 }
 
 // ── Persistence ────────────────────────────────────────────────────────────
@@ -40,6 +57,7 @@ function saveState() {
       fillOpacity,
       borderColor,
       borderOpacity,
+      iconColor,
       selectedBadges: [...selectedBadges],
       groupOrder,
     }));
@@ -147,6 +165,11 @@ async function init() {
     document.getElementById('border-opacity').value = borderOpacity;
     document.getElementById('border-opacity-value').textContent = borderOpacity + '%';
   }
+  if (saved?.iconColor) {
+    iconColor = saved.iconColor;
+    document.getElementById('icon-color-picker').value = iconColor;
+    document.getElementById('icon-color-hex').value = iconColor;
+  }
 
   // Style pills
   document.querySelectorAll('#style-pills .pill').forEach(pill => {
@@ -158,6 +181,21 @@ async function init() {
       document.getElementById('fill-row').classList.toggle('visible', currentStyle === 'filled');
       updatePreview();
     });
+  });
+
+  // Icon (badge content) color
+  document.getElementById('icon-color-picker').addEventListener('input', e => {
+    iconColor = e.target.value;
+    document.getElementById('icon-color-hex').value = iconColor;
+    updatePreview();
+  });
+  document.getElementById('icon-color-hex').addEventListener('input', e => {
+    const v = e.target.value;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+      iconColor = v;
+      document.getElementById('icon-color-picker').value = v;
+      updatePreview();
+    }
   });
 
   // Border color + opacity
@@ -208,6 +246,7 @@ async function init() {
     currentStyle = DEFAULT_STYLE;
     borderColor = '#ffffff'; borderOpacity = 100;
     fillColor = '#000000'; fillOpacity = 100;
+    iconColor = '#ffffff';
     document.querySelectorAll('#style-pills .pill').forEach(p =>
       p.classList.toggle('active', p.dataset.value === currentStyle)
     );
@@ -220,6 +259,8 @@ async function init() {
     document.getElementById('fill-color-hex').value = '#000000';
     document.getElementById('fill-opacity').value = 100;
     document.getElementById('fill-opacity-value').textContent = '100%';
+    document.getElementById('icon-color-picker').value = '#ffffff';
+    document.getElementById('icon-color-hex').value = '#ffffff';
     // Reset context to player
     document.querySelectorAll('#context-cards .context-card').forEach(c =>
       c.classList.toggle('active', c.dataset.value === 'player')
@@ -534,7 +575,7 @@ function updatePreview() {
       }
 
       const img = document.createElement('img');
-      img.src = fragment.imageURL;
+      img.src = recolorDataUri(fragment.imageURL, iconColor);
       chip.appendChild(img);
       previewContainer.appendChild(chip);
 
@@ -544,6 +585,7 @@ function updatePreview() {
 
       filters.push({
         ...fragment,
+        imageURL: recolorDataUri(fragment.imageURL, iconColor),
         tagStyle: currentStyle === 'bordered' ? 'bordered' : 'filled',
         tagColor: tagColorArgb,
         borderColor: borderColorArgb,
@@ -611,6 +653,9 @@ function updatePreview() {
   }
   if (borderColorArgb !== '#FFFFFFFF') {
     params += `&bc=${encodeURIComponent(borderColorArgb)}`;
+  }
+  if (iconColor !== '#ffffff') {
+    params += `&ic=${encodeURIComponent(iconColor)}`;
   }
 
   // go= group order (only when reordered from manifest default)
