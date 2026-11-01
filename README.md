@@ -1,6 +1,6 @@
 # Player Badges
 
-Vectorized SVG badges for NuvioTV and NuvioMobile. Badges show playback info (resolution, codec, HDR, audio format, language, source quality) as small chips in the player controls overlay and source list.
+Vectorized SVG badges for NuvioTV and NuvioMobile. Badges show playback info (resolution, HDR, audio format, channels, language, source quality) as small chips in the player controls overlay and source list.
 
 **Live editor**: https://nuvio-badge-editor.pages.dev
 **API**: https://nuvio-badges.skoruppa.workers.dev/v1/badge.json
@@ -8,10 +8,10 @@ Vectorized SVG badges for NuvioTV and NuvioMobile. Badges show playback info (re
 ## Two contexts
 
 ### Player context (`p-` prefix)
-Badges matched against decoder info + filename. Language badges have speaker icon 🔊 and space-bounded regex (only matches `playbackMatchText` tokens, not filename).
+Shows what is playing right now. Badges match decoder tokens first; a group with no decoder hit falls back to the filename and stream name, so `pattern` must stay exclusive within a group. Source and Special always come from those names, because the decoder cannot report them. The stream description is not available here. Language badges have speaker icon 🔊 and space-bounded regex (only matches `playbackMatchText` tokens, not filename).
 
 ### Source context (`s-` prefix)
-Badges matched against stream filename/title. Language badges are text-only (no speaker icon) with word-boundary regex + script detection (e.g. `[가-힯]{3,}` for Korean characters in filename).
+Badges matched against stream filename, name, title and description. Language badges are text-only (no speaker icon) with word-boundary regex + script detection (e.g. `[가-힯]{3,}` for Korean characters in filename).
 
 Non-language badges share `p-` IDs and SVGs with the player context, but every tag found gets its own badge (e.g. Dolby Vision + HDR10+, TrueHD + Atmos). The worker swaps `pattern` for `sourcePattern` when `c=source`; overrides live in `SOURCE_PATTERNS` in `generate-manifest.py`.
 
@@ -24,7 +24,7 @@ player-badges/
     hdr/                     Dolby Vision, HDR10+, HDR10, HLG, HDR
     audio/                   Dolby Atmos/Digital+/Digital/TrueHD, DTS variants, FLAC, Opus, AAC, AC-4
     channels/                7.1, 6.1, 5.1, 2.0, 1.0
-    source/                  Remux, BluRay, WebDL, WebRip, HDTV, DVDScr, DVDRip, CAM, R5
+    source/                  Remux, BluRay, WebDL, WebRip, HDTV, DVDRip, DVDScr, CAM, R5
     special/                 IMAX, IMAX Enhanced, SeaDex
     language/<locale>/
       vectorized/            Speaker icon + text (player context)
@@ -47,7 +47,7 @@ player-badges/
     generate-manifest.py     Manifest + fragments + bundles generator
     update-badge-svg.py      Update individual badges after manual SVG edits
     dev-server.js            Local dev server (API + editor)
-    deploy-worker.sh         Deploy API worker + KV upload
+    deploy-worker.sh         Deploy API worker + KV upload + cache purge
     upload-kv.py             Upload changed fragments to KV
     deploy-pages.sh          Deploy web editor to Cloudflare Pages
     deploy-all.sh            Full pipeline (regenerate + deploy everything)
@@ -55,7 +55,7 @@ player-badges/
     index.html               Badge editor (HTML shell)
     app.js                   Editor logic
     style.css                Editor styles
-    i18n.js                  UI translations (22 languages)
+    i18n.js                  UI translations (18 languages)
   worker/
     index.js                 Cloudflare Worker (badge API)
     wrangler.toml            Worker config
@@ -65,8 +65,8 @@ player-badges/
 ## SVG design
 
 - **ViewBox**: 14px height, variable width
-- **Font**: Roboto Medium (9px), vectorized as `<path>` curves (font-independent, works on all platforms including iOS)
-- **Non-Latin scripts**: Noto Sans fallback chain (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek)
+- **Font**: Roboto Medium (9px), Roboto Bold for the bold variant, vectorized as `<path>` curves (font-independent, works on all platforms including iOS)
+- **Non-Latin scripts**: Noto Sans fallback chain (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek), with bold counterparts
 - **Dolby**: DD logo with the full name; compact uses the boxed Dolby mark with a short uppercase label (VISION, ATMOS, DIGITAL+)
 - **Variants**: Fragments carry `images` (`bold`, `compact`, `boldCompact`); the worker swaps one into `imageURL`
 - **Icons**: Inline SVG shapes (Dolby DD logo, speaker with waves, disc, globe, TV, camera, IMAX logo)
@@ -82,6 +82,7 @@ player-badges/
 GET /v1/badge.json?l=en&g=res,hdr,aud,ch,lang
 GET /v1/badge.json?l=pl&g=res,hdr,aud,ch,lang&c=source
 GET /v1/badge.json?l=en&g=res,hdr&x=p-480p,p-hlg&go=hdr,res
+GET /v1/badge.json?l=en&c=source&b=1&cp=1&p=gold
 ```
 
 ### Parameters
@@ -93,15 +94,19 @@ GET /v1/badge.json?l=en&g=res,hdr&x=p-480p,p-hlg&go=hdr,res
 | `x` | Badge IDs to exclude | — |
 | `go` | Group display order (when reordered) | player: `res,hdr,aud,ch,lang,src,spc`<br>source: `res,src,hdr,aud,ch,spc,lang` |
 | `o.{gid}` | Badge order within group (e.g. `o.lang=s-pol,s-eng`) | — |
-| `s` | Style: `bordered`, `filled`, `none` | `filled` |
+| `s` | Style: `bordered`, `filled`, `none` | `bordered` |
 | `b` | Bold text (`1`); logos stay unchanged | off |
 | `cp` | Compact: no icons, Dolby as boxed mark + short label (`1`) | off |
+| `p` | Color preset: `colorful`, `neon`, `stealth`, `gold`; replaces `tc`, `bc` and `ic` | — |
 | `tc` | Tag color (#AARRGGBB) | `#00000000` |
 | `bc` | Border color (#AARRGGBB) | `#FFFFFFFF` |
+| `ic` | Badge content color (#RRGGBB) | `#ffffff` |
+
+Without `go`, groups always follow the context default, whatever the order in `g`.
 
 ### Caching
-- **Cloudflare edge cache**: 30 days (`CDN-Cache-Control: max-age=2592000`)
-- **Browser cache**: 1 day (`Cache-Control: max-age=86400`)
+- **Cloudflare edge cache**: 1 year (`CDN-Cache-Control: max-age=31536000`), purged on every worker deploy
+- **Browser cache**: 1 hour (`Cache-Control: max-age=3600`)
 - Each unique URL = unique cache key (normalized, params sorted)
 - Second request to same URL from same PoP: `cf-cache-status: HIT`, worker not invoked
 
@@ -112,7 +117,7 @@ GET /v1/badge.json?l=en&g=res,hdr&x=p-480p,p-hlg&go=hdr,res
 | `hdr` | HDR / Vision | Dolby Vision, HDR10+, HDR10, HLG, HDR |
 | `aud` | Audio Format | Atmos, TrueHD, DD+, DD, DTS:X, DTS-HD MA, DTS-HD, DTS, FLAC, Opus, AAC, AC-4 |
 | `ch` | Channels | 7.1, 6.1, 5.1, 2.0, 1.0 |
-| `src` | Source | Remux, BluRay, WebDL, WebRip, HDTV, DVDScr, DVDRip, CAM, R5 |
+| `src` | Source | Remux, BluRay, WebDL, WebRip, HDTV, DVDRip, DVDScr, CAM, R5 |
 | `spc` | Special | IMAX Enhanced, IMAX, SeaDex |
 | `lang` | Language | 35 languages × 27 locales |
 
@@ -124,23 +129,42 @@ GET /v1/badge.json?l=en&g=res,hdr&x=p-480p,p-hlg&go=hdr,res
 # Edit an SVG in Inkscape, then update just that badge:
 python3 scripts/update-badge-svg.py p-imax-e
 
-# Regenerate everything and deploy:
+# Regenerate manifest + fragments and deploy:
 bash scripts/deploy-all.sh
 ```
+
+`deploy-all.sh` does not run `generate-language-assets.py`, so run that first after changing languages or translations.
+
+### Deploying
+
+- **Cache purge key**: put `PURGE_KEY=...` in a git-ignored `.env`, matching the worker secret set with `wrangler secret put PURGE_KEY`. Without it the deploy skips the purge and prints a warning.
+- **KV write limit**: the free plan limits writes per day, so only changed fragments are uploaded. Changes to every fragment (e.g. `BADGE_STYLE`) can use up the daily limit. `--skip-kv` and `deploy-pages.sh` do not write to KV.
+- **After a deploy**: KV reads can lag for about a minute, so `upload-kv.py --dry-run` may briefly report everything as changed.
+- **Apps**: an imported URL keeps its filters, so users must import it again to get changes.
+
+### Adding a badge
+
+Nothing keeps these lists in sync, so update each one:
+
+1. `FILTERS` in `generate-manifest.py` and `SOURCE_PATTERNS` if the source regex differs
+2. `STATIC_BADGES` in `badge_vec.py`
+3. `GROUP_FILTERS` in `worker/index.js` and `scripts/dev-server.js`
+4. `PRESETS` in `worker/index.js` and `web/app.js` for per-badge colors
+5. Group lists: `GROUP_ORDER` in `worker/index.js`, `scripts/dev-server.js` and `generate-manifest.py` when adding a group
 
 ### Individual scripts
 
 | Script | Purpose |
 |---|---|
-| `generate-language-assets.py` | Generate vectorized language SVGs for all locales (requires FreeType + Babel) |
+| `generate-language-assets.py` | Generate vectorized language SVGs for all locales (requires FreeType, Babel and HarfBuzz) |
 | `generate-badge-json.py` | Generate full test JSONs (player-badge.json etc.) |
 | `generate-manifest.py` | Generate manifest + fragments + bundles |
 | `update-badge-svg.py` | Update output after manual SVG edit (`--all` for all badges) |
-| `dev-server.js` | Local dev server: `node scripts/dev-server.js [port]` |
+| `dev-server.js` | Local dev server: `node scripts/dev-server.js [port]`, editor at `/`; no `p` or `ic` support |
 | `deploy-worker.sh` | Upload changed KV entries + deploy worker (`--skip-kv` to skip KV, `--full` to upload everything) |
 | `upload-kv.py` | Upload only changed fragments, tracked in KV under `_deployed` (`--dry-run` to preview) |
-| `deploy-pages.sh` | Deploy web editor to Cloudflare Pages |
-| `deploy-all.sh` | Full pipeline: regenerate → KV → worker → Pages |
+| `deploy-pages.sh` | Deploy web editor to the production Pages branch |
+| `deploy-all.sh` | Full pipeline: manifest → KV → worker → cache purge → Pages |
 
 ### Requirements
 - Python 3.8+: `pip install -r requirements.txt` (freetype-py, babel, uharfbuzz)
@@ -151,18 +175,19 @@ bash scripts/deploy-all.sh
 ## App integration
 
 ### NuvioTV
-- `PlayerBadges.kt` — `rememberPlayerBadges()` builds merged candidate, matches against filters
+- `PlayerBadges.kt` — `rememberPlayerBadges()` collects playback and name candidates
+- `StreamBadgeRules.kt` — filter import, `StreamBadgeMatcher` and two-phase player matching
 - `PlaybackMatchText.kt` — generates synthetic tokens from decoder info
 - `PlayerMediaInfo.kt` — reads codec/HDR/channel info from ExoPlayer and mpv
-- `StreamImportedBadgeChip.kt` — renders the badge chip UI
+- `StreamBadgeChips.kt` — `StreamImportedBadgeChip` renders the badge chip UI
 
 ### NuvioMobile
-- Same architecture in `composeApp/src/commonMain/.../player/`
+- Same architecture in `composeApp/src/commonMain/.../features/player/` and `features/streams/`
 
 ### Chip rendering
 - Chip height: 20dp, image height: ~16dp
-- Image width: min 34dp, max 92dp
-- `ContentScale.Fit`, `tagColor: #00000000` = transparent (SVG content only)
+- Image width (NuvioTV): min 34dp, max 92dp, so short compact labels keep side margins
+- `ContentScale.Fit`; `tagColor` is drawn only with `tagStyle: filled`
 
 ## Localization notes
 
@@ -170,5 +195,5 @@ bash scripts/deploy-all.sh
 - Brazilian Portuguese (`pt-BR`) is a separate badge from European Portuguese (`pt`) in both contexts
 - `pt` (Portugal) and `pt-br` (Brazil) UI locales have distinct translations: Polaco/Polonês, Checo/Tcheco
 - Source language regex includes emoji flag matching (🇵🇱, 🇬🇧, 🇧🇷, etc.) and script detection (CJK, Cyrillic, Arabic)
-- Non-Latin scripts use Noto Sans fallback (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek)
+- Non-Latin scripts use Noto Sans fallback (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek), shaped with HarfBuzz
 - ISO locale uses 3-letter codes (ENG, POL, SPA)
