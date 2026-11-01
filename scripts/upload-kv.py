@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Upload badge fragments to Cloudflare KV, sending only entries that changed.
+Upload badge bundles to Cloudflare KV, sending only entries that changed.
 
 Writes on the free plan are limited per day, so a hash of every deployed value
 is kept in KV under `_deployed`. It always reflects what production holds and
@@ -24,21 +24,43 @@ import tempfile
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 FRAGMENTS_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "output", "fragments")
 STATE_KEY = "_deployed"
+CONTEXTS = {"player": "p-", "source": "s-"}
+VARIANTS = ["default", "bold", "compact", "boldCompact"]
+
+
+def read_fragment(path):
+    with open(path) as f:
+        return json.load(f)
+
+
+def resolve_fragment(fragment, context, variant):
+    """Fragment as served: the context's pattern and the variant's image, nothing else."""
+    resolved = dict(fragment)
+    images = resolved.pop("images", {})
+    source_pattern = resolved.pop("sourcePattern", None)
+    if context == "source" and source_pattern:
+        resolved["pattern"] = source_pattern
+    if variant in images:
+        resolved["imageURL"] = images[variant]
+    return resolved
 
 
 def local_entries():
-    entries = {}
-    for path in glob.glob(os.path.join(FRAGMENTS_DIR, "*.json")):
-        name = os.path.basename(path)
-        if name != "groups.json":
-            with open(path) as f:
-                entries[name[: -len(".json")]] = f.read()
+    """One bundle per context, locale and variant, so a request costs a single KV read."""
+    static = [read_fragment(path) for path in sorted(glob.glob(os.path.join(FRAGMENTS_DIR, "p-*.json")))]
 
-    for path in glob.glob(os.path.join(FRAGMENTS_DIR, "lang", "*", "*.json")):
-        locale = os.path.basename(os.path.dirname(path))
-        fid = os.path.basename(path)[: -len(".json")]
-        with open(path) as f:
-            entries[f"lang/{locale}/{fid}"] = f.read()
+    entries = {}
+    for locale_dir in sorted(glob.glob(os.path.join(FRAGMENTS_DIR, "lang", "*"))):
+        locale = os.path.basename(locale_dir)
+        for context, prefix in CONTEXTS.items():
+            pattern = os.path.join(locale_dir, f"{prefix}*.json")
+            language = [read_fragment(path) for path in sorted(glob.glob(pattern))]
+            for variant in VARIANTS:
+                bundle = {
+                    fragment["id"]: resolve_fragment(fragment, context, variant)
+                    for fragment in static + language
+                }
+                entries[f"bundle/{context}/{locale}/{variant}"] = json.dumps(bundle, separators=(",", ":"))
     return entries
 
 
@@ -60,7 +82,7 @@ def deployed_hashes(namespace_id):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Upload changed badge fragments to KV.")
+    parser = argparse.ArgumentParser(description="Upload changed badge bundles to KV.")
     parser.add_argument("--namespace-id", required=True)
     parser.add_argument("--dry-run", action="store_true", help="report changes, upload nothing")
     parser.add_argument("--full", action="store_true", help="upload everything")

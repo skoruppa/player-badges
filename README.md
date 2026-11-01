@@ -48,7 +48,7 @@ player-badges/
     update-badge-svg.py      Update individual badges after manual SVG edits
     dev-server.js            Local dev server (API + editor)
     deploy-worker.sh         Deploy API worker + KV upload + cache purge
-    upload-kv.py             Upload changed fragments to KV
+    upload-kv.py             Build bundles and upload changed ones to KV
     deploy-pages.sh          Deploy web editor to Cloudflare Pages
     deploy-all.sh            Full pipeline (regenerate + deploy everything)
   web/
@@ -107,7 +107,7 @@ Without `go`, groups always follow the context default, whatever the order in `g
 ### Caching
 - **Cloudflare edge cache**: 1 year (`CDN-Cache-Control: max-age=31536000`), purged on every worker deploy
 - **Browser cache**: 1 hour (`Cache-Control: max-age=3600`)
-- Each unique URL = unique cache key (normalized, params sorted)
+- Each unique URL string = unique cache key; the worker does not normalize parameter order
 - Second request to same URL from same PoP: `cf-cache-status: HIT`, worker not invoked
 
 ### Groups
@@ -138,7 +138,9 @@ bash scripts/deploy-all.sh
 ### Deploying
 
 - **Cache purge key**: put `PURGE_KEY=...` in a git-ignored `.env`, matching the worker secret set with `wrangler secret put PURGE_KEY`. Without it the deploy skips the purge and prints a warning.
-- **KV write limit**: the free plan limits writes per day, so only changed fragments are uploaded. Changes to every fragment (e.g. `BADGE_STYLE`) can use up the daily limit. `--skip-kv` and `deploy-pages.sh` do not write to KV.
+- **KV bundles**: `upload-kv.py` builds `bundle/<context>/<locale>/<variant>` from `output/fragments/`, 216 entries in total. A request costs one KV read, and a change to a shared badge rewrites all bundles.
+- **KV write limit**: the free plan limits writes per day, so only changed bundles are uploaded. `--skip-kv` and `deploy-pages.sh` do not write to KV.
+- **Worker and KV format**: upload KV first when the bundle format changes, because `--skip-kv` deploys a worker that expects bundles already in KV.
 - **After a deploy**: KV reads can lag for about a minute, so `upload-kv.py --dry-run` may briefly report everything as changed.
 - **Apps**: an imported URL keeps its filters, so users must import it again to get changes.
 
@@ -161,8 +163,8 @@ Nothing keeps these lists in sync, so update each one:
 | `generate-manifest.py` | Generate manifest + fragments + bundles |
 | `update-badge-svg.py` | Update output after manual SVG edit (`--all` for all badges) |
 | `dev-server.js` | Local dev server: `node scripts/dev-server.js [port]`, editor at `/`; no `p` or `ic` support |
-| `deploy-worker.sh` | Upload changed KV entries + deploy worker (`--skip-kv` to skip KV, `--full` to upload everything) |
-| `upload-kv.py` | Upload only changed fragments, tracked in KV under `_deployed` (`--dry-run` to preview) |
+| `deploy-worker.sh` | Upload changed KV bundles + deploy worker (`--skip-kv` to skip KV, `--full` to upload everything) |
+| `upload-kv.py` | Build KV bundles and upload only changed ones, tracked under `_deployed` (`--dry-run` to preview) |
 | `deploy-pages.sh` | Deploy web editor to the production Pages branch |
 | `deploy-all.sh` | Full pipeline: manifest → KV → worker → cache purge → Pages |
 

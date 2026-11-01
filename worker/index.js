@@ -1,7 +1,8 @@
 /**
  * Cloudflare Worker - Dynamic Badge JSON API
  *
- * Assembles a badge JSON from KV-stored fragments based on URL parameters.
+ * Assembles a badge JSON from a KV-stored bundle based on URL parameters.
+ * Each context, locale and variant has one bundle, so a request costs one KV read.
  * Cache-friendly: each unique URL = unique cache key.
  *
  * URL: /v1/badge.json?l=en&g=res,hdr,aud,ch,lang
@@ -64,9 +65,6 @@ const SOURCE_LANG_FILTERS = [
   "s-heb", "s-tha", "s-vie", "s-ind", "s-msa", "s-hrv", "s-srp", "s-bul",
   "s-slk", "s-slv",
 ];
-
-// All lang filter IDs (for KV key lookup)
-const ALL_LANG_IDS = new Set([...GROUP_FILTERS.lang, ...SOURCE_LANG_FILTERS]);
 
 // Presets — per style variant colors + per-badge overrides
 const PRESETS = {
@@ -151,7 +149,7 @@ export default {
     const style = url.searchParams.get("s") || "bordered";
     const bold = url.searchParams.get("b") === "1";
     const compact = url.searchParams.get("cp") === "1";
-    const imageVariant = bold ? (compact ? "boldCompact" : "bold") : (compact ? "compact" : null);
+    const variant = bold ? (compact ? "boldCompact" : "bold") : (compact ? "compact" : "default");
     const presetName = url.searchParams.get("p");
     const preset = presetName ? PRESETS[presetName] : null;
     const presetVariant = preset ? (preset[style] || preset.bordered) : null;
@@ -201,26 +199,16 @@ export default {
     }
     filterIds = filterIds.filter(id => !excludeSet.has(id));
 
-    // Load fragments from KV
+    // Load the bundle from KV; an unknown locale falls back to English labels
+    const bundleContext = context === "source" ? "source" : "player";
+    const bundle = await env.BADGE_FRAGMENTS.get(`bundle/${bundleContext}/${locale}/${variant}`, "json")
+      ?? await env.BADGE_FRAGMENTS.get(`bundle/${bundleContext}/en/${variant}`, "json")
+      ?? {};
+
     const filters = [];
     for (const id of filterIds) {
-      let kvKey;
-      if (ALL_LANG_IDS.has(id)) {
-        kvKey = `lang/${locale}/${id}`;
-      } else {
-        kvKey = id;
-      }
-
-      const data = await env.BADGE_FRAGMENTS.get(kvKey, "json");
+      const data = bundle[id];
       if (!data) continue;
-
-      // Source context reports every tag found, not one per group
-      if (context === "source" && data.sourcePattern) data.pattern = data.sourcePattern;
-      delete data.sourcePattern;
-
-      // Bold/compact artwork; badges without a variant keep imageURL
-      if (data.images?.[imageVariant]) data.imageURL = data.images[imageVariant];
-      delete data.images;
 
       // Apply style overrides
       const badgeColor = presetBadgeColors[id];
