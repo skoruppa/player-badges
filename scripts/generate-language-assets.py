@@ -3,7 +3,7 @@
 Generate vectorized SVG language badges for all app locales and audio languages.
 
 Uses Roboto Medium as primary font with Noto Sans fallback chain for non-Latin scripts
-(Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek).
+(Arabic, Hebrew, CJK, Devanagari, Bengali, Tamil, Telugu, Malayalam, Thai, Greek).
 
 Output: player-badges/assets/language/<locale>/vectorized/<iso3>.svg
 
@@ -49,6 +49,9 @@ def _build_font_chain(bold=False):
         ("NotoSansHebrew-Regular.ttf", "/usr/share/fonts/truetype/noto/NotoSansHebrew-Regular.ttf"),
         ("NotoSansBengali-Regular.ttf", "/usr/share/fonts/truetype/noto/NotoSansBengali-Regular.ttf"),
         ("NotoSansDevanagari-Regular.ttf", "/usr/share/fonts/truetype/noto/NotoSansDevanagari-Regular.ttf"),
+        ("NotoSansTamil-Regular.ttf", "/usr/share/fonts/truetype/noto/NotoSansTamil-Regular.ttf"),
+        ("NotoSansTelugu-Regular.ttf", "/usr/share/fonts/truetype/noto/NotoSansTelugu-Regular.ttf"),
+        ("NotoSansMalayalam-Regular.ttf", "/usr/share/fonts/truetype/noto/NotoSansMalayalam-Regular.ttf"),
         ("NotoSansThai-Regular.ttf", "/usr/share/fonts/truetype/noto/NotoSansThai-Regular.ttf"),
         ("NotoSansCJK-Regular.ttc", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"),
     ]
@@ -68,7 +71,7 @@ APP_LOCALES = {
     "el": "el", "es": "es", "fr": "fr", "he": "he", "hr": "hr", "hu": "hu",
     "id": "id", "it": "it", "ja": "ja", "nb": "nb", "nl": "nl", "pl": "pl",
     "pt": "pt", "pt-br": "pt_BR", "ro": "ro", "ru": "ru", "sk": "sk",
-    "tr": "tr", "ur": "ur", "vi": "vi",
+    "ta": "ta", "te": "te", "ml": "ml", "tr": "tr", "ur": "ur", "vi": "vi",
 }
 
 AUDIO_LANGS = [
@@ -279,6 +282,9 @@ PT_BR_LABELS = {
     "sv": "Brasiliansk",
     "da": "Brasiliansk",
     "fi": "Brasilian",
+    "ta": "பிரேசிலியன்",
+    "te": "బ్రెజిలియన్",
+    "ml": "ബ്രസീലിയൻ",
 }
 
 

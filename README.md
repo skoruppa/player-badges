@@ -66,7 +66,7 @@ player-badges/
 
 - **ViewBox**: 14px height, variable width
 - **Font**: Roboto Medium (9px), Roboto Bold for the bold variant, vectorized as `<path>` curves (font-independent, works on all platforms including iOS)
-- **Non-Latin scripts**: Noto Sans fallback chain (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek), with bold counterparts
+- **Non-Latin scripts**: Noto Sans fallback chain (Arabic, Hebrew, CJK, Devanagari, Bengali, Tamil, Telugu, Malayalam, Thai, Greek), with bold counterparts
 - **Dolby**: DD logo with the full name; compact uses the boxed Dolby mark with a short uppercase label (VISION, ATMOS, DIGITAL+)
 - **Variants**: Fragments carry `images` (`bold`, `compact`, `boldCompact`); the worker swaps one into `imageURL`
 - **Icons**: Inline SVG shapes (Dolby DD logo, speaker with waves, disc, globe, TV, camera, IMAX logo)
@@ -119,7 +119,7 @@ Without `go`, groups always follow the context default, whatever the order in `g
 | `ch` | Channels | 7.1, 6.1, 5.1, 2.0, 1.0 |
 | `src` | Source | Remux, BluRay, WebDL, WebRip, HDTV, DVDRip, DVDScr, CAM, R5 |
 | `spc` | Special | IMAX Enhanced, IMAX, SeaDex |
-| `lang` | Language | 35 languages × 27 locales |
+| `lang` | Language | 35 languages × 30 locales |
 | `rat` | Star Rating (opt-in, request it with `g=`) | 5 down to 0.5 in half steps, read from AIOStreams `::star` text in the stream name |
 
 ## Scripts
@@ -139,7 +139,7 @@ bash scripts/deploy-all.sh
 ### Deploying
 
 - **Cache purge key**: put `PURGE_KEY=...` in a git-ignored `.env`, matching the worker secret set with `wrangler secret put PURGE_KEY`. Without it the deploy skips the purge and prints a warning.
-- **KV bundles**: `upload-kv.py` builds `bundle/<context>/<locale>/<variant>` from `output/fragments/`, 216 entries in total. A request costs one KV read, and a change to a shared badge rewrites all bundles.
+- **KV bundles**: `upload-kv.py` builds `bundle/<context>/<locale>/<variant>` from `output/fragments/`, 240 entries in total. A request costs one KV read, and a change to a shared badge rewrites all bundles.
 - **KV write limit**: the free plan limits writes per day, so only changed bundles are uploaded. `--skip-kv` and `deploy-pages.sh` do not write to KV.
 - **Worker and KV format**: upload KV first when the bundle format changes, because `--skip-kv` deploys a worker that expects bundles already in KV.
 - **After a deploy**: KV reads can lag for about a minute, so `upload-kv.py --dry-run` may briefly report everything as changed.
@@ -194,10 +194,10 @@ Nothing keeps these lists in sync, so update each one:
 
 ## Localization notes
 
-- 27 UI locales for language badge labels
+- 30 UI locales for language badge labels
 - Brazilian Portuguese (`pt-BR`) is a separate badge from European Portuguese (`pt`) in both contexts
 - `pt` (Portugal) and `pt-br` (Brazil) UI locales have distinct translations: Polaco/Polonês, Checo/Tcheco
 - Source language regex also matches AIOStreams `::smallcaps` codes (`ᴊᴀ · ᴇɴ`), skipping subtitle codes in brackets
 - Source language regex includes emoji flag matching (🇵🇱, 🇬🇧, 🇧🇷, etc.) and script detection (CJK, Cyrillic, Arabic)
-- Non-Latin scripts use Noto Sans fallback (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek), shaped with HarfBuzz
+- Non-Latin scripts use Noto Sans fallback (Arabic, Hebrew, CJK, Devanagari, Bengali, Tamil, Telugu, Malayalam, Thai, Greek), shaped with HarfBuzz
 - ISO locale uses 3-letter codes (ENG, POL, SPA)

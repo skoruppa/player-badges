@@ -276,7 +276,7 @@ def _small_language_pattern(sid):
 AVAILABLE_LOCALES = [
     "en", "ar", "bg", "bn", "cs", "de", "el", "es", "fr", "he", "hr", "hu",
     "id", "it", "ja", "nb", "nl", "pl", "pt", "pt-br", "ro", "ru", "sk",
-    "tr", "ur", "vi", "iso",
+    "ta", "te", "ml", "tr", "ur", "vi", "iso",
 ]
 
 

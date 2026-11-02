@@ -86,7 +86,9 @@ const PRESETS = {
       'p-dtsx': '#999999', 'p-dtshdma': '#999999', 'p-dtshd': '#888888', 'p-dts': '#888888',
       'p-flac': '#888888', 'p-opus': '#888888', 'p-aac': '#777777', 'p-ac4': '#777777',
       'p-71': '#888888', 'p-61': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
-    }
+    },
+    groupIconColors: { rat: '#ffcc00' },
+    borderlessGroups: ['rat']
   },
   neon: {
     bordered: { bc: '#CC00ffcc', tc: '#00000000', ic: '#00ffcc' },
@@ -164,6 +166,8 @@ export default {
     const bc = presetVariant ? presetVariant.bc : decodeURIComponent(url.searchParams.get("bc") || "#FFFFFFFF");
     const ic = presetVariant ? presetVariant.ic : decodeURIComponent(url.searchParams.get("ic") || "#ffffff");
     const presetBadgeColors = preset ? (preset.badgeColors || {}) : {};
+    const presetGroupIconColors = preset ? (preset.groupIconColors || {}) : {};
+    const presetBorderlessGroups = preset ? (preset.borderlessGroups || []) : [];
 
     // Build effective group filters map (swap lang based on context)
     const effectiveFilters = { ...GROUP_FILTERS };
@@ -226,10 +230,14 @@ export default {
         data.tagColor = tc;
         data.borderColor = bc;
       }
+      if (presetBorderlessGroups.includes(data.groupId)) {
+        data.borderColor = '#00000000';
+      }
 
       // Recolor badge SVG
-      if (ic !== '#ffffff' && ic !== '#FFFFFF' && data.imageURL) {
-        data.imageURL = recolorSvg(data.imageURL, ic);
+      const iconColor = presetGroupIconColors[data.groupId] || ic;
+      if (iconColor !== '#ffffff' && iconColor !== '#FFFFFF' && data.imageURL) {
+        data.imageURL = recolorSvg(data.imageURL, iconColor);
       }
 
       filters.push(data);

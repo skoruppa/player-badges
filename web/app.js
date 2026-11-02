@@ -41,7 +41,9 @@ const PRESETS = {
       'p-dtsx': '#999999', 'p-dtshdma': '#999999', 'p-dtshd': '#888888', 'p-dts': '#888888',
       'p-flac': '#888888', 'p-opus': '#888888', 'p-aac': '#777777', 'p-ac4': '#777777',
       'p-71': '#888888', 'p-61': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
-    }
+    },
+    groupIconColors: { rat: '#ffcc00' },
+    borderlessGroups: ['rat']
   },
   neon: {
     name: 'Neon',
@@ -64,6 +66,8 @@ const PRESETS = {
 };
 let activePreset = null;
 let badgeColors = {}; // badgeId → border hex color (per-badge override from preset)
+let groupIconColors = {}; // groupId → icon hex color (per-group override from preset)
+let borderlessGroups = []; // groupIds drawn without a border (from preset)
 
 function getContext() {
   return document.querySelector('#context-cards .context-card.active')?.dataset.value || 'player';
@@ -84,6 +88,8 @@ function applyPreset(key) {
   fillColor = variant.fillColor || '#000000'; fillOpacity = variant.fillOpacity || 100;
   iconColor = variant.iconColor;
   badgeColors = { ...(p.badgeColors || {}) };
+  groupIconColors = { ...(p.groupIconColors || {}) };
+  borderlessGroups = [...(p.borderlessGroups || [])];
 
   // Update UI controls (don't change style pill)
   document.getElementById('border-color-picker').value = borderColor;
@@ -308,6 +314,8 @@ async function init() {
   function clearPreset() {
     activePreset = 'default';
     badgeColors = {};
+    groupIconColors = {};
+    borderlessGroups = [];
     document.querySelectorAll('.preset-pill').forEach(p =>
       p.classList.toggle('active', p.dataset.key === 'default')
     );
@@ -400,6 +408,8 @@ async function init() {
     compactBadges = false;
     syncVariantToggles();
     badgeColors = {};
+    groupIconColors = {};
+    borderlessGroups = [];
     activePreset = 'default';
     document.querySelectorAll('.preset-pill').forEach(p =>
       p.classList.toggle('active', p.dataset.key === 'default')
@@ -737,7 +747,7 @@ function updatePreview() {
       const badgeBc = badgeColors[badgeId];
       const borderRgba = (() => {
         const bc = badgeBc || borderColor;
-        const bo = badgeBc ? 100 : borderOpacity;
+        const bo = borderlessGroups.includes(fragment.groupId) ? 0 : badgeBc ? 100 : borderOpacity;
         return `rgba(${parseInt(bc.slice(1,3),16)},${parseInt(bc.slice(3,5),16)},${parseInt(bc.slice(5,7),16)},${bo/100})`;
       })();
 
@@ -754,13 +764,14 @@ function updatePreview() {
       }
 
       const img = document.createElement('img');
-      img.src = recolorDataUri(badgeImage(fragment), iconColor);
+      const badgeIconColor = groupIconColors[fragment.groupId] || iconColor;
+      img.src = recolorDataUri(badgeImage(fragment), badgeIconColor);
       chip.appendChild(img);
       previewContainer.appendChild(chip);
 
       // Build filter for JSON — #AARRGGBB format
       const badgeBorderColor = badgeColors[badgeId] || borderColor;
-      const badgeBorderOpacity = badgeColors[badgeId] ? 100 : borderOpacity;
+      const badgeBorderOpacity = borderlessGroups.includes(fragment.groupId) ? 0 : badgeColors[badgeId] ? 100 : borderOpacity;
       const tagColorArgb = currentStyle === 'filled'
         ? toArgb(badgeColors[badgeId] || fillColor, fillOpacity)
         : '#00000000';
@@ -771,7 +782,7 @@ function updatePreview() {
       filters.push({
         ...filter,
         pattern: (getContext() === 'source' && sourcePattern) || filter.pattern,
-        imageURL: recolorDataUri(badgeImage(fragment), iconColor),
+        imageURL: recolorDataUri(badgeImage(fragment), badgeIconColor),
         tagStyle: currentStyle === 'bordered' ? 'bordered' : 'filled',
         tagColor: tagColorArgb,
         borderColor: borderColorArgb,

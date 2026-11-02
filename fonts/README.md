@@ -17,6 +17,9 @@ License: Apache License 2.0
 - `NotoSansHebrew-Regular.ttf` — Hebrew script
 - `NotoSansBengali-Regular.ttf` — Bengali script
 - `NotoSansDevanagari-Regular.ttf` — Devanagari script (Hindi)
+- `NotoSansTamil-Regular.ttf` — Tamil script
+- `NotoSansTelugu-Regular.ttf` — Telugu script
+- `NotoSansMalayalam-Regular.ttf` — Malayalam script
 - `NotoSansThai-Regular.ttf` — Thai script
 - `NotoSansCJK-Regular.ttc` — Chinese, Japanese, Korean
 
