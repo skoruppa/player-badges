@@ -526,6 +526,13 @@ async function loadBadges(forceSelectAll = false) {
     }
   }
 
+  // Opt-in groups stay off until the user selected them
+  for (const filter of manifest.filters) {
+    if (manifest.hiddenGroups.includes(filter.groupId) && !referenceSelected?.has(filter.id)) {
+      deselectedIds.add(filter.id);
+    }
+  }
+
   for (const group of manifest.groups) {
     const groupFilters = manifest.filters.filter(f => {
       if (f.groupId !== group.id) return false;
@@ -802,8 +809,8 @@ function updatePreview() {
     params += `&c=${context}`;
   }
 
-  // g= only when not all groups selected (omit = all groups)
-  const allGroupIds = manifest.groups.map(g => g.id);
+  // g= only when the selection differs from the default groups (omit = default groups)
+  const allGroupIds = manifest.groups.map(g => g.id).filter(gid => !manifest.hiddenGroups.includes(gid));
   const isAllGroups = activeGroupIds.length === allGroupIds.length &&
     allGroupIds.every(gid => activeGroupIds.includes(gid));
   if (!isAllGroups) {

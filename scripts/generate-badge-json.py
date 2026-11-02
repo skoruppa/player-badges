@@ -431,8 +431,8 @@ FILTER_DEFS = [
     # Audio — mutually exclusive: Atmos > TrueHD > DD+ > DD, DTS:X > DTS-HD MA > DTS-HD > DTS
     ("p-atmos",   "aud", "Dolby Atmos",   r"(?i)\bAtmos\b",                                                     "audio/dolby-atmos"),
     ("p-truehd",  "aud", "Dolby TrueHD",  r"(?i)^(?!.*\bAtmos\b).*\bTrueHD\b",                                 "audio/dolby-truehd"),
-    ("p-ddp",     "aud", "Dolby Digital+", r"(?i)^(?!.*\bAtmos\b)(?!.*\bTrueHD\b).*\b(DD\+|DDP|EAC3)\b",       "audio/dolby-digital-plus"),
-    ("p-dd",      "aud", "Dolby Digital",  r"(?i)^(?!.*\bAtmos\b)(?!.*\bTrueHD\b)(?!.*\b(DD\+|DDP|EAC3)\b).*\b(DD|AC3)\b", "audio/dolby-digital"),
+    ("p-ddp",     "aud", "Dolby Digital+", r"(?i)^(?!.*\bAtmos\b)(?!.*\bTrueHD\b).*(?:\bDD\+|\b(?:DDP|EAC3)\b)",       "audio/dolby-digital-plus"),
+    ("p-dd",      "aud", "Dolby Digital",  r"(?i)^(?!.*\bAtmos\b)(?!.*\bTrueHD\b)(?!.*(?:\bDD\+|\b(?:DDP|EAC3)\b)).*\b(DD|AC3)\b", "audio/dolby-digital"),
     ("p-dtsx",    "aud", "DTS:X",          r"(?i)\bDTS:X\b",                                                    "audio/dtsx"),
     ("p-dtshdma", "aud", "DTS-HD MA",      r"(?i)^(?!.*\bDTS:X\b).*\bDTS-HD MA\b",                              "audio/dts-hd-ma"),
     ("p-dtshd",   "aud", "DTS-HD",         r"(?i)^(?!.*\bDTS:X\b)(?!.*\bDTS-HD MA\b).*\bDTS-HD\b",             "audio/dts-hd"),

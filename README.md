@@ -90,9 +90,9 @@ GET /v1/badge.json?l=en&c=source&b=1&cp=1&p=gold
 |---|---|---|
 | `l` | Locale (en, pl, de, ja, iso...) | `en` |
 | `c` | Context: `player` or `source` | `player` |
-| `g` | Group IDs to include (comma-separated) | all groups |
+| `g` | Group IDs to include (comma-separated) | all groups except opt-in `rat` |
 | `x` | Badge IDs to exclude | — |
-| `go` | Group display order (when reordered) | player: `res,hdr,aud,ch,lang,src,spc`<br>source: `res,src,hdr,aud,ch,spc,lang` |
+| `go` | Group display order (when reordered) | player: `res,hdr,aud,ch,lang,src,spc,rat`<br>source: `res,src,hdr,aud,ch,spc,lang,rat` |
 | `o.{gid}` | Badge order within group (e.g. `o.lang=s-pol,s-eng`) | — |
 | `s` | Style: `bordered`, `filled`, `none` | `bordered` |
 | `b` | Bold text (`1`); logos stay unchanged | off |
@@ -120,6 +120,7 @@ Without `go`, groups always follow the context default, whatever the order in `g
 | `src` | Source | Remux, BluRay, WebDL, WebRip, HDTV, DVDRip, DVDScr, CAM, R5 |
 | `spc` | Special | IMAX Enhanced, IMAX, SeaDex |
 | `lang` | Language | 35 languages × 27 locales |
+| `rat` | Star Rating (opt-in, request it with `g=`) | 5 down to 0.5 in half steps, read from AIOStreams `::star` text in the stream name |
 
 ## Scripts
 
@@ -196,6 +197,7 @@ Nothing keeps these lists in sync, so update each one:
 - 27 UI locales for language badge labels
 - Brazilian Portuguese (`pt-BR`) is a separate badge from European Portuguese (`pt`) in both contexts
 - `pt` (Portugal) and `pt-br` (Brazil) UI locales have distinct translations: Polaco/Polonês, Checo/Tcheco
+- Source language regex also matches AIOStreams `::smallcaps` codes (`ᴊᴀ · ᴇɴ`), skipping subtitle codes in brackets
 - Source language regex includes emoji flag matching (🇵🇱, 🇬🇧, 🇧🇷, etc.) and script detection (CJK, Cyrillic, Arabic)
 - Non-Latin scripts use Noto Sans fallback (Arabic, Hebrew, CJK, Devanagari, Bengali, Thai, Greek), shaped with HarfBuzz
 - ISO locale uses 3-letter codes (ENG, POL, SPA)

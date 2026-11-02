@@ -33,12 +33,16 @@ const GROUPS = [
   { id: "src", name: "Source", isExpanded: true },
   { id: "spc", name: "Special", isExpanded: true },
   { id: "lang", name: "Language", isExpanded: true },
+  { id: "rat", name: "Star Rating", isExpanded: true },
 ];
 
 const GROUP_ORDER = {
-  player: ["res", "hdr", "aud", "ch", "lang", "src", "spc"],
-  source: ["res", "src", "hdr", "aud", "ch", "spc", "lang"],
+  player: ["res", "hdr", "aud", "ch", "lang", "src", "spc", "rat"],
+  source: ["res", "src", "hdr", "aud", "ch", "spc", "lang", "rat"],
 };
+
+// Opt-in groups: returned only when requested with g=
+const HIDDEN_GROUPS = ["rat"];
 
 const GROUP_FILTERS = {
   res: ["p-8k", "p-4k", "p-1440p", "p-1080p", "p-720p", "p-480p"],
@@ -47,6 +51,7 @@ const GROUP_FILTERS = {
   ch: ["p-71", "p-61", "p-51", "p-20", "p-10"],
   src: ["p-remux", "p-bluray", "p-webdl", "p-webrip", "p-hdtv", "p-dvdrip", "p-dvdscr", "p-cam", "p-r5"],
   spc: ["p-imax-e", "p-imax", "p-seadex"],
+  rat: ["p-star50", "p-star45", "p-star40", "p-star35", "p-star30", "p-star25", "p-star20", "p-star15", "p-star10", "p-star05"],
   lang: [
     "p-eng", "p-pol", "p-spa", "p-fre", "p-ger", "p-ita", "p-por", "p-por-br", "p-rus",
     "p-jpn", "p-kor", "p-zho", "p-hin", "p-ara", "p-tur", "p-dut", "p-swe",
@@ -72,7 +77,7 @@ function handleBadgeApi(query) {
   const locale = query.l || 'en';
   const context = query.c || 'player';
   const defaultOrder = GROUP_ORDER[context] || GROUP_ORDER.player;
-  const groupsParam = query.g || defaultOrder.join(',');
+  const groupsParam = query.g || defaultOrder.filter(gid => !HIDDEN_GROUPS.includes(gid)).join(',');
   const excludeParam = query.x || '';
   const groupOrderParam = query.go || '';
   const style = query.s || 'bordered';

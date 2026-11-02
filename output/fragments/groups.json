@@ -33,5 +33,10 @@
     "id": "lang",
     "name": "Language",
     "isExpanded": true
+  },
+  {
+    "id": "rat",
+    "name": "Star Rating",
+    "isExpanded": true
   }
 ]

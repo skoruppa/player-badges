@@ -90,6 +90,13 @@ CAMERA_ICON = '''<g transform="translate({x}, 2)">
 
 IMAX_ICON_W = 42
 
+STAR_SIZE = 8
+STAR_GAP = 1
+STAR_COUNT = 5
+STAR_STROKE = 0.8
+STAR_CENTER_Y = 7.2
+STAR_ICON_W = 9
+
 
 # ── FreeType helpers ────────────────────────────────────────────────────────
 
@@ -162,6 +169,20 @@ def ft_to_path_d(ttf_path, text, x_offset=0, size=FONT_SIZE, baseline=Y_BASELINE
     return " ".join(parts), pen_x - x_offset
 
 
+def star_points(cx, cy, radius):
+    """Clockwise from the top tip; index 5 is the inner point at the bottom center."""
+    points = []
+    for i in range(10):
+        r = radius if i % 2 == 0 else radius * 0.45
+        angle = math.radians(-90 + 36 * i)
+        points.append((cx + r * math.cos(angle), cy + r * math.sin(angle)))
+    return points
+
+
+def _points_d(points):
+    return "M" + " L".join(f"{x:.2f},{y:.2f}" for x, y in points) + " Z"
+
+
 def even_ceil(v):
     v = math.ceil(v)
     return v + 1 if v % 2 else v
@@ -219,6 +240,41 @@ def vec_icon_text(label, icon_tpl, icon_w, gap=3, font=ROBOTO_MEDIUM):
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="14" viewBox="0 0 {w} 14">\n'
         f'  {icon}\n  <path d="{d}" fill="white"/>\n</svg>\n'
+    )
+
+
+def vec_stars(rating):
+    """Five stars: solid up to the rating, half solid for .5, the rest outlined."""
+    shapes = []
+    for i in range(STAR_COUNT):
+        cx = PAD_L + STAR_SIZE / 2 + i * (STAR_SIZE + STAR_GAP)
+        points = star_points(cx, STAR_CENTER_Y, STAR_SIZE / 2)
+        if rating < i + 1:
+            shapes.append(
+                f'<path d="{_points_d(points)}" fill="none" stroke="white" '
+                f'stroke-width="{STAR_STROKE}" stroke-linejoin="round"/>'
+            )
+        if rating >= i + 1:
+            shapes.append(f'<path d="{_points_d(points)}" fill="white"/>')
+        elif rating >= i + 0.5:
+            shapes.append(f'<path d="{_points_d(points[5:] + points[:1])}" fill="white"/>')
+    w = even_ceil(PAD_L + STAR_COUNT * STAR_SIZE + (STAR_COUNT - 1) * STAR_GAP + PAD_R)
+    inner = "\n  ".join(shapes)
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="14" viewBox="0 0 {w} 14">\n'
+        f'  {inner}\n</svg>\n'
+    )
+
+
+def vec_star_rating(rating, font=ROBOTO_MEDIUM):
+    """One star with the number, for compact badges."""
+    tx = PAD_L + STAR_ICON_W + 2
+    d, adv = ft_to_path_d(font, f"{rating:.1f}", tx)
+    w = even_ceil(tx + adv + PAD_R)
+    star = _points_d(star_points(PAD_L + STAR_ICON_W / 2, STAR_CENTER_Y, STAR_ICON_W / 2))
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="14" viewBox="0 0 {w} 14">\n'
+        f'  <path d="{star}" fill="white"/>\n  <path d="{d}" fill="white"/>\n</svg>\n'
     )
 
 
@@ -283,6 +339,11 @@ STATIC_BADGES = {
     "p-cam":    ("source/cam.svg",    "icon_text", ("CAM",    "camera")),
     "p-r5":     ("source/r5.svg",     "text",      ("R5",)),
 
+    **{
+        f"p-star{int(rating * 10):02d}": (f"rating/{rating}.svg", "stars", (rating,))
+        for rating in (5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5)
+    },
+
     "p-imax-e": ("special/imax-enhanced.svg", "raw", ()),
     "p-imax":   ("special/imax.svg",          "imax", ()),
     "p-seadex": ("special/seadex.svg",        "text", ("SeaDex",)),
@@ -328,6 +389,8 @@ def vectorize_badge(badge_id, base_dir=None, bold=False, compact=False):
             return vec_text_only(label, font)
         icon_tpl, icon_w = ICON_MAP[icon_type]
         return vec_icon_text(label, icon_tpl, icon_w, font=font)
+    elif vec_type == "stars":
+        return vec_star_rating(vec_args[0], font) if compact else vec_stars(vec_args[0])
     elif vec_type == "imax":
         return vec_imax(base_dir)
     return None
