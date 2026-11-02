@@ -70,14 +70,14 @@ def content_hash(value):
 
 def deployed_hashes(namespace_id):
     """Hashes stored in KV; empty on first deploy. Other failures abort the deploy."""
-    result = subprocess.run(
-        ["wrangler", "kv", "key", "get", STATE_KEY, f"--namespace-id={namespace_id}", "--remote", "--text"],
-        capture_output=True, text=True,
-    )
-    if result.returncode == 0:
-        return json.loads(result.stdout)
-    if "404: Not Found" in result.stdout + result.stderr:
-        return {}
+    command = ["wrangler", "kv", "key", "get", STATE_KEY, f"--namespace-id={namespace_id}", "--remote", "--text"]
+    # The first call after a token refresh can fail, so allow one retry
+    for _ in range(2):
+        result = subprocess.run(command, capture_output=True, text=True)
+        if result.returncode == 0:
+            return json.loads(result.stdout)
+        if "404: Not Found" in result.stdout + result.stderr:
+            return {}
     sys.exit(f"Could not read {STATE_KEY}:\n{result.stderr}")
 
 
