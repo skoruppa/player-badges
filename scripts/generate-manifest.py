@@ -181,6 +181,9 @@ LANGUAGE_DEFS = [
     ("p-kor", "Korean",     "kor", r"(?i)(?:^| )(ko|kor|korean)(?= |$)"),
     ("p-zho", "Chinese",    "zho", r"(?i)(?:^| )(zh|chi|zho|chinese)(?= |$)"),
     ("p-hin", "Hindi",      "hin", r"(?i)(?:^| )(hi|hin|hindi)(?= |$)"),
+    ("p-tam", "Tamil",      "tam", r"(?i)(?:^| )(ta|tam|tamil)(?= |$)"),
+    ("p-tel", "Telugu",     "tel", r"(?i)(?:^| )(te|tel|telugu)(?= |$)"),
+    ("p-mal", "Malayalam",  "mal", r"(?i)(?:^| )(ml|mal|malayalam)(?= |$)"),
     ("p-ara", "Arabic",     "ara", r"(?i)(?:^| )(ar|ara|arabic)(?= |$)"),
     ("p-tur", "Turkish",    "tur", r"(?i)(?:^| )(tr|tur|turkish)(?= |$)"),
     ("p-dut", "Dutch",      "nld", r"(?i)(?:^| )(nl|nld|dut|dutch)(?= |$)"),
@@ -205,6 +208,16 @@ LANGUAGE_DEFS = [
     ("p-slv", "Slovenian",  "slv", r"(?i)(?:^| )(sl|slv|slovenian)(?= |$)"),
 ]
 
+
+def _indian_code(code):
+    """Tam, Tel and Mal are also ordinary words (Tel Aviv), so they count only in capitals
+    or inside a language list ("[Tam + Tel + Hin]")."""
+    return (
+        rf"(?-i:\b{code.upper()}\b)"
+        rf"|(?<=[\[(+,/|]\s?)\b{code}\b|\b{code}\b(?=\s?[\])+,/|])"
+    )
+
+
 # Source context: text-only (no speaker icon), matches filename (word-boundary + script detection + emoji flags)
 SOURCE_LANGUAGE_DEFS = [
     ("s-eng", "English",    "eng", r"(?i)\benglish\b|\beng\b|\ben\b|🇬🇧|🇺🇸"),
@@ -220,6 +233,9 @@ SOURCE_LANGUAGE_DEFS = [
     ("s-kor", "Korean",     "kor", r"(?i)\bkorean\b|\bkor\b|\bko\b|[\uAC00-\uD7AF]{3,}|🇰🇷"),
     ("s-zho", "Chinese",    "zho", r"(?i)\bchinese\b|\bchi\b|\bzh\b|[\u4E00-\u9FFF]{3,}|🇨🇳"),
     ("s-hin", "Hindi",      "hin", r"(?i)\bhindi\b|\bhin\b|\bhi\b|[\u0900-\u097F]{3,}|🇮🇳"),
+    ("s-tam", "Tamil",      "tam", rf"(?i)\btamil\b|{_indian_code('tam')}|[\u0B80-\u0BFF]{{3,}}"),
+    ("s-tel", "Telugu",     "tel", rf"(?i)\btelugu\b|{_indian_code('tel')}|[\u0C00-\u0C7F]{{3,}}"),
+    ("s-mal", "Malayalam",  "mal", rf"(?i)\bmalayalam\b|{_indian_code('mal')}|[\u0D00-\u0D7F]{{3,}}"),
     ("s-ara", "Arabic",     "ara", r"(?i)\barabic\b|\bara\b|\bar\b|[\u0600-\u06FF]{3,}|🇸🇦"),
     ("s-tur", "Turkish",    "tur", r"(?i)\bturkish\b|\btur\b|\btr\b|🇹🇷"),
     ("s-dut", "Dutch",      "nld", r"(?i)\bdutch\b|\bnld\b|\bnl\b|🇳🇱"),
@@ -254,7 +270,7 @@ SMALL_CAPS = dict(zip(
 SOURCE_LANGUAGE_CODES = {
     "s-eng": "en", "s-pol": "pl", "s-spa": "es", "s-fre": "fr", "s-ger": "de", "s-ita": "it",
     "s-por": "pt", "s-por-br": "pt-br", "s-rus": "ru", "s-jpn": "ja", "s-kor": "ko", "s-zho": "zh",
-    "s-hin": "hi", "s-ara": "ar", "s-tur": "tr", "s-dut": "nl", "s-swe": "sv", "s-nor": "no",
+    "s-hin": "hi", "s-tam": "ta", "s-tel": "te", "s-mal": "ml", "s-ara": "ar", "s-tur": "tr", "s-dut": "nl", "s-swe": "sv", "s-nor": "no",
     "s-dan": "da", "s-fin": "fi", "s-ces": "cs", "s-hun": "hu", "s-ron": "ro", "s-ukr": "uk",
     "s-ell": "el", "s-heb": "he", "s-tha": "th", "s-vie": "vi", "s-ind": "id", "s-msa": "ms",
     "s-hrv": "hr", "s-srp": "sr", "s-bul": "bg", "s-slk": "sk", "s-slv": "sl",

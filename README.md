@@ -119,7 +119,7 @@ Without `go`, groups always follow the context default, whatever the order in `g
 | `ch` | Channels | 7.1, 6.1, 5.1, 2.0, 1.0 |
 | `src` | Source | Remux, BluRay, WebDL, WebRip, HDTV, DVDRip, DVDScr, CAM, R5 |
 | `spc` | Special | IMAX Enhanced, IMAX, SeaDex |
-| `lang` | Language | 35 languages × 30 locales |
+| `lang` | Language | 38 languages × 30 locales |
 | `rat` | Star Rating (opt-in, request it with `g=`) | 5 down to 0.5 in half steps, read from AIOStreams `::star` text in the stream name |
 
 ## Scripts

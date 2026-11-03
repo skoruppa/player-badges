@@ -75,7 +75,7 @@ APP_LOCALES = {
 }
 
 AUDIO_LANGS = [
-    "en", "pl", "es", "fr", "de", "it", "pt", "pt_BR", "ru", "ja", "ko", "zh", "hi",
+    "en", "pl", "es", "fr", "de", "it", "pt", "pt_BR", "ru", "ja", "ko", "zh", "hi", "ta", "te", "ml",
     "ar", "tr", "nl", "sv", "no", "da", "fi", "cs", "hu", "ro", "uk", "el",
     "he", "th", "vi", "id", "ms", "hr", "sr", "bg", "sk", "sl",
 ]
@@ -83,7 +83,7 @@ AUDIO_LANGS = [
 AUDIO_TO_ISO3 = {
     "en": "eng", "pl": "pol", "es": "spa", "fr": "fra", "de": "deu", "it": "ita",
     "pt": "por", "pt_BR": "por-br", "ru": "rus", "ja": "jpn", "ko": "kor", "zh": "zho",
-    "hi": "hin", "ar": "ara", "tr": "tur", "nl": "nld", "sv": "swe", "no": "nor",
+    "hi": "hin", "ta": "tam", "te": "tel", "ml": "mal", "ar": "ara", "tr": "tur", "nl": "nld", "sv": "swe", "no": "nor",
     "da": "dan", "fi": "fin", "cs": "ces", "hu": "hun", "ro": "ron", "uk": "ukr",
     "el": "ell", "he": "heb", "th": "tha", "vi": "vie", "id": "ind", "ms": "msa",
     "hr": "hrv", "sr": "srp", "bg": "bul", "sk": "slk", "sl": "slv",

@@ -55,7 +55,7 @@ const GROUP_FILTERS = {
   rat: ["p-star50", "p-star45", "p-star40", "p-star35", "p-star30", "p-star25", "p-star20", "p-star15", "p-star10", "p-star05"],
   lang: [
     "p-eng", "p-pol", "p-spa", "p-fre", "p-ger", "p-ita", "p-por", "p-por-br", "p-rus",
-    "p-jpn", "p-kor", "p-zho", "p-hin", "p-ara", "p-tur", "p-dut", "p-swe",
+    "p-jpn", "p-kor", "p-zho", "p-hin", "p-tam", "p-tel", "p-mal", "p-ara", "p-tur", "p-dut", "p-swe",
     "p-nor", "p-dan", "p-fin", "p-ces", "p-hun", "p-ron", "p-ukr", "p-ell",
     "p-heb", "p-tha", "p-vie", "p-ind", "p-msa", "p-hrv", "p-srp", "p-bul",
     "p-slk", "p-slv",
@@ -65,7 +65,7 @@ const GROUP_FILTERS = {
 // Source context: text-only badges, filename-matching regex
 const SOURCE_LANG_FILTERS = [
   "s-eng", "s-pol", "s-spa", "s-fre", "s-ger", "s-ita", "s-por", "s-por-br", "s-rus",
-  "s-jpn", "s-kor", "s-zho", "s-hin", "s-ara", "s-tur", "s-dut", "s-swe",
+  "s-jpn", "s-kor", "s-zho", "s-hin", "s-tam", "s-tel", "s-mal", "s-ara", "s-tur", "s-dut", "s-swe",
   "s-nor", "s-dan", "s-fin", "s-ces", "s-hun", "s-ron", "s-ukr", "s-ell",
   "s-heb", "s-tha", "s-vie", "s-ind", "s-msa", "s-hrv", "s-srp", "s-bul",
   "s-slk", "s-slv",
