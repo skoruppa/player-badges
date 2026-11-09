@@ -352,7 +352,7 @@
       "id": "p-cam",
       "groupId": "src",
       "name": "CAM",
-      "pattern": "(?i)^(?=.*(?:\\b(?:hd[-_. ]?)?cam(?:[-_. ]?rip)?\\b|\\b(?:hd[-_. ]?)?ts(?:[-_. ]?rip)?\\b|\\btelesync\\b|\\bp(?:re[\\s._-]?)?dvd(?:rip)?\\b|\\b(?:hd[-_. ]?)?tc(?:[-_. ]?rip)?\\b|\\btelecine\\b|(?<!dvd)(?<!dvd[._-])\\bscr(?:eener)?\\b))(?!.*\\bdvd[\\s._-]?scr)",
+      "pattern": "(?i)^(?=.*(?:\\b(?:hd[-_. ]?)?cam(?:[-_. ]?rip)?\\b|\\b(?:hd[-_. ]?)?ts(?:[-_. ]?rip)?\\b(?!\\s*:)(?!(?<=\\.ts)(?:\\s|$))|\\btelesync\\b|\\bp(?:re[\\s._-]?)?dvd(?:rip)?\\b|\\b(?:hd[-_. ]?)?tc(?:[-_. ]?rip)?\\b(?!\\s*:)|\\btelecine\\b|(?<!dvd)(?<!dvd[._-])\\bscr(?:eener)?\\b))(?!.*\\bdvd[\\s._-]?scr)",
       "assetPath": "source/cam.svg",
       "type": "static"
     },

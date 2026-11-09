@@ -99,7 +99,8 @@ FILTERS = [
     ("p-hdtv",   "src", "HDTV",   r"(?i)\b(?:hdtv|pdtv|sdtv|dsr)\b", "source/hdtv.svg"),
     ("p-dvdrip", "src", "DVDRip", r"(?i)^(?=.*\bdvd[\s._-]?rip\b)(?!.*\bdvd[\s._-]?scr)", "source/dvdrip.svg"),
     ("p-dvdscr", "src", "DVDScr", r"(?i)\bdvd[\s._-]?scr(?:eener)?\b", "source/dvdscr.svg"),
-    ("p-cam",    "src", "CAM",    r"(?i)^(?=.*(?:\b(?:hd[-_. ]?)?cam(?:[-_. ]?rip)?\b|\b(?:hd[-_. ]?)?ts(?:[-_. ]?rip)?\b|\btelesync\b|\bp(?:re[\s._-]?)?dvd(?:rip)?\b|\b(?:hd[-_. ]?)?tc(?:[-_. ]?rip)?\b|\btelecine\b|(?<!dvd)(?<!dvd[._-])\bscr(?:eener)?\b))(?!.*\bdvd[\s._-]?scr)", "source/cam.svg"),
+    # TS:/TC: are fansub credits (typesetting), a trailing .ts is the MPEG-TS extension
+    ("p-cam",    "src", "CAM",    r"(?i)^(?=.*(?:\b(?:hd[-_. ]?)?cam(?:[-_. ]?rip)?\b|\b(?:hd[-_. ]?)?ts(?:[-_. ]?rip)?\b(?!\s*:)(?!(?<=\.ts)(?:\s|$))|\btelesync\b|\bp(?:re[\s._-]?)?dvd(?:rip)?\b|\b(?:hd[-_. ]?)?tc(?:[-_. ]?rip)?\b(?!\s*:)|\btelecine\b|(?<!dvd)(?<!dvd[._-])\bscr(?:eener)?\b))(?!.*\bdvd[\s._-]?scr)", "source/cam.svg"),
     ("p-r5",     "src", "R5",     r"(?i)\br5\b", "source/r5.svg"),
     # Special
     ("p-imax-e", "spc", "IMAX Enhanced", r"(?i)\bimax[\s._-]?enhanced\b", "special/imax-enhanced.svg"),
@@ -160,7 +161,8 @@ SOURCE_PATTERNS = {
     # Source: Remux stays exclusive with BluRay, a remux is one source type, not two tags
     "p-webrip": r"(?i)\b(?:web|hd)[-_. ]?rip\b|(?<!bd[-_. ])(?<!br[-_. ])(?<!dvd[-_. ])(?<!tc[-_. ])(?<!ts[-_. ])(?<!cam[-_. ])\brip\b",
     "p-dvdrip":  r"(?i)\bdvd[\s._-]?rip\b",
-    "p-cam":     r"(?i)\b(?:hd[-_. ]?)?cam(?:[-_. ]?rip)?\b|\b(?:hd[-_. ]?)?ts(?:[-_. ]?rip)?\b|\btelesync\b|\bp(?:re[\s._-]?)?dvd(?:rip)?\b|\b(?:hd[-_. ]?)?tc(?:[-_. ]?rip)?\b|\btelecine\b|(?<!dvd)(?<!dvd[-_. ])\bscr(?:eener)?\b",
+    # Same TS:/TC: and .ts exclusions as the player pattern
+    "p-cam":     r"(?i)\b(?:hd[-_. ]?)?cam(?:[-_. ]?rip)?\b|\b(?:hd[-_. ]?)?ts(?:[-_. ]?rip)?\b(?!\s*:)(?!(?<=\.ts)(?:\s|$))|\btelesync\b|\bp(?:re[\s._-]?)?dvd(?:rip)?\b|\b(?:hd[-_. ]?)?tc(?:[-_. ]?rip)?\b(?!\s*:)|\btelecine\b|(?<!dvd)(?<!dvd[-_. ])\bscr(?:eener)?\b",
     # Special
     "p-imax":    r"(?i)\bIMAX\b(?![\s._-]?enhanced)",
 }
