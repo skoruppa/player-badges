@@ -26,6 +26,7 @@ player-badges/
     channels/                7.1, 6.1, 5.1, 2.0, 1.0
     source/                  Remux, BluRay, WebDL, WebRip, HDTV, DVDRip, DVDScr, CAM, R5
     special/                 IMAX, IMAX Enhanced, SeaDex
+    network/                 Streaming service wordmarks (Netflix, Prime Video, Disney+...)
     language/<locale>/
       vectorized/            Speaker icon + text (player context)
       text-only/             Text only (source context, compact player)
@@ -90,9 +91,9 @@ GET /v1/badge.json?l=en&c=source&b=1&cp=1&p=gold
 |---|---|---|
 | `l` | Locale (en, pl, de, ja, iso...) | `en` |
 | `c` | Context: `player` or `source` | `player` |
-| `g` | Group IDs to include (comma-separated) | all groups except opt-in `rat` |
+| `g` | Group IDs to include (comma-separated) | all groups except opt-in `rat` and `net` |
 | `x` | Badge IDs to exclude | — |
-| `go` | Group display order (when reordered) | player: `res,hdr,aud,ch,lang,src,spc,rat`<br>source: `res,src,hdr,aud,ch,spc,lang,rat` |
+| `go` | Group display order (when reordered) | player: `res,hdr,aud,ch,lang,src,spc,net,rat`<br>source: `res,src,hdr,aud,ch,spc,lang,net,rat` |
 | `o.{gid}` | Badge order within group (e.g. `o.lang=s-pol,s-eng`) | — |
 | `s` | Style: `bordered`, `filled`, `none` | `bordered` |
 | `b` | Bold text (`1`); logos stay unchanged | off |
@@ -120,7 +121,15 @@ Without `go`, groups always follow the context default, whatever the order in `g
 | `src` | Source | Remux, BluRay, WebDL, WebRip, HDTV, DVDRip, DVDScr, CAM, R5 |
 | `spc` | Special | IMAX Enhanced, IMAX, SeaDex |
 | `lang` | Language | 38 languages × 30 locales |
+| `net` | Networks (opt-in, request it with `g=`) | Netflix, Prime Video, Apple TV, Disney+, HBO Max, Hulu, Peacock, Paramount+, Crave, Crunchyroll |
 | `rat` | Star Rating (opt-in, request it with `g=`) | 5 down to 0.5 in half steps, read from AIOStreams `::star` text in the stream name |
+
+### Networks
+Network badges read release tags. Unique tags (`NFLX`, `AMZN`, `ATVP`, `DSNP`, `HMAX`, `HULU`, `PCOK`, `PMTP`, `CRAV`) and full names (`Netflix`, `Prime Video`, `Apple TV`, `Disney+`, `HBO Max`, `Paramount+`, `Crunchyroll`) match anywhere. Short codes and plain words that also appear in titles (`NF`, `MAX`, `CR`, `HBO`, `Amazon`, `Disney`, `Peacock`, `Paramount`, `Crave`) match only right before `WEB`, `WEB-DL` or `WEBRip`, and `MAX` only in capitals.
+
+The wordmarks come from Wikimedia Commons, where they are tagged `PD-textlogo` and trademarked. Each one is flattened to a single white path, so it follows the icon color and presets, and stays the same in bold and compact variants. The Disney+ arc, the Peacock dots and the Prime Video smile are left out, Paramount+ is the wordmark only and HBO Max is the horizontal lockup.
+
+Logos are trademarks of their owners and only show where a release comes from. Nuvio is not affiliated with these services.
 
 ## Scripts
 

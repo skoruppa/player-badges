@@ -347,6 +347,18 @@ STATIC_BADGES = {
     "p-imax-e": ("special/imax-enhanced.svg", "raw", ()),
     "p-imax":   ("special/imax.svg",          "imax", ()),
     "p-seadex": ("special/seadex.svg",        "text", ("SeaDex",)),
+
+    # Wordmarks from Wikimedia Commons (PD-textlogo, trademarked), flattened to one white path
+    "p-nflx": ("network/netflix.svg",        "raw", ()),
+    "p-amzn": ("network/prime-video.svg",    "raw", ()),
+    "p-atvp": ("network/apple-tv.svg",       "raw", ()),
+    "p-dsnp": ("network/disney-plus.svg",    "raw", ()),
+    "p-hmax": ("network/hbo-max.svg",        "raw", ()),
+    "p-hulu": ("network/hulu.svg",           "raw", ()),
+    "p-pcok": ("network/peacock.svg",        "raw", ()),
+    "p-pmtp": ("network/paramount-plus.svg", "raw", ()),
+    "p-crav": ("network/crave.svg",          "raw", ()),
+    "p-cr":   ("network/crunchyroll.svg",    "raw", ()),
 }
 
 ICON_MAP = {

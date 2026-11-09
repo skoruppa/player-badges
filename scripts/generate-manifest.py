@@ -36,15 +36,16 @@ GROUPS = [
     {"id": "spc",  "name": "Special",       "isExpanded": True},
     {"id": "lang", "name": "Language",      "isExpanded": True},
     {"id": "rat",  "name": "Star Rating",   "isExpanded": True},
+    {"id": "net",  "name": "Networks",      "isExpanded": True},
 ]
 
 # Opt-in groups: left out of the API default and unselected in the editor
-HIDDEN_GROUPS = ["rat"]
+HIDDEN_GROUPS = ["rat", "net"]
 
 # Default display order per context (mirrors GROUP_ORDER in worker/index.js)
 GROUP_ORDER = {
-    "player": ["res", "hdr", "aud", "ch", "lang", "src", "spc", "rat"],
-    "source": ["res", "src", "hdr", "aud", "ch", "spc", "lang", "rat"],
+    "player": ["res", "hdr", "aud", "ch", "lang", "src", "spc", "net", "rat"],
+    "source": ["res", "src", "hdr", "aud", "ch", "spc", "lang", "net", "rat"],
 }
 
 BADGE_STYLE = {
@@ -121,6 +122,32 @@ def _star_pattern(rating):
 FILTERS += [
     (f"p-star{int(rating * 10):02d}", "rat", f"{rating} Stars", _star_pattern(rating), f"rating/{rating}.svg")
     for rating in (5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5)
+]
+
+# Release tags sit right before the source: NF.WEB-DL, AMZN WEBRip
+_BEFORE_WEB = r"(?=[\s._-]?web(?:[\s._-]?(?:dl|rip))?\b)"
+
+
+def _network_pattern(anywhere, before_web=None):
+    """Unique tags (NFLX, AMZN) match anywhere. Short codes and plain words (NF, MAX, Disney)
+    also appear in titles, so they count only right before WEB."""
+    if before_web:
+        anywhere += rf"|(?:{before_web}){_BEFORE_WEB}"
+    return "(?i)" + anywhere
+
+
+FILTERS += [
+    ("p-nflx", "net", "Netflix",     _network_pattern(r"\b(?:nflx|netflix)\b", r"\bnf"), "network/netflix.svg"),
+    ("p-amzn", "net", "Prime Video", _network_pattern(r"\b(?:amzn|amazon[\s._-]?prime|prime[\s._-]?video)\b", r"\bamazon"), "network/prime-video.svg"),
+    ("p-atvp", "net", "Apple TV",    _network_pattern(r"\batvp\b|\bapple[\s._-]?tv(?![a-z0-9])"), "network/apple-tv.svg"),
+    ("p-dsnp", "net", "Disney+",     _network_pattern(r"\b(?:dsnp|dsny)\b|\bdisney[\s._-]?(?:\+|plus\b)", r"\bdisney"), "network/disney-plus.svg"),
+    # Uppercase MAX only, so a title like "Mad Max WEB-DL" stays out
+    ("p-hmax", "net", "HBO Max",     _network_pattern(r"\b(?:hmax|hbo[\s._-]?max)\b", r"\bhbo|(?-i:\bMAX)"), "network/hbo-max.svg"),
+    ("p-hulu", "net", "Hulu",        _network_pattern(r"\bhulu\b"), "network/hulu.svg"),
+    ("p-pcok", "net", "Peacock",     _network_pattern(r"\bpcok\b", r"\bpeacock"), "network/peacock.svg"),
+    ("p-pmtp", "net", "Paramount+",  _network_pattern(r"\bpmtp\b|\bparamount[\s._-]?(?:\+|plus\b)", r"\bparamount"), "network/paramount-plus.svg"),
+    ("p-crav", "net", "Crave",       _network_pattern(r"\bcrav\b", r"\bcrave"), "network/crave.svg"),
+    ("p-cr",   "net", "Crunchyroll", _network_pattern(r"\bcrunchy[\s._-]?roll\b", r"\bcr"), "network/crunchyroll.svg"),
 ]
 
 # Source context overrides: filenames can list several formats at once, so every tag found

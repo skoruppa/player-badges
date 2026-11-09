@@ -40,6 +40,11 @@
       "id": "rat",
       "name": "Star Rating",
       "isExpanded": true
+    },
+    {
+      "id": "net",
+      "name": "Networks",
+      "isExpanded": true
     }
   ],
   "groupOrder": {
@@ -51,6 +56,7 @@
       "lang",
       "src",
       "spc",
+      "net",
       "rat"
     ],
     "source": [
@@ -61,11 +67,13 @@
       "ch",
       "spc",
       "lang",
+      "net",
       "rat"
     ]
   },
   "hiddenGroups": [
-    "rat"
+    "rat",
+    "net"
   ],
   "filters": [
     {
@@ -466,6 +474,86 @@
       "name": "0.5 Stars",
       "pattern": "(?<![★⯪☆])★{0}(?:⯪☆*|☆)(?![★⯪☆])",
       "assetPath": "rating/0.5.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-nflx",
+      "groupId": "net",
+      "name": "Netflix",
+      "pattern": "(?i)\\b(?:nflx|netflix)\\b|(?:\\bnf)(?=[\\s._-]?web(?:[\\s._-]?(?:dl|rip))?\\b)",
+      "assetPath": "network/netflix.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-amzn",
+      "groupId": "net",
+      "name": "Prime Video",
+      "pattern": "(?i)\\b(?:amzn|amazon[\\s._-]?prime|prime[\\s._-]?video)\\b|(?:\\bamazon)(?=[\\s._-]?web(?:[\\s._-]?(?:dl|rip))?\\b)",
+      "assetPath": "network/prime-video.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-atvp",
+      "groupId": "net",
+      "name": "Apple TV",
+      "pattern": "(?i)\\batvp\\b|\\bapple[\\s._-]?tv(?![a-z0-9])",
+      "assetPath": "network/apple-tv.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-dsnp",
+      "groupId": "net",
+      "name": "Disney+",
+      "pattern": "(?i)\\b(?:dsnp|dsny)\\b|\\bdisney[\\s._-]?(?:\\+|plus\\b)|(?:\\bdisney)(?=[\\s._-]?web(?:[\\s._-]?(?:dl|rip))?\\b)",
+      "assetPath": "network/disney-plus.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-hmax",
+      "groupId": "net",
+      "name": "HBO Max",
+      "pattern": "(?i)\\b(?:hmax|hbo[\\s._-]?max)\\b|(?:\\bhbo|(?-i:\\bMAX))(?=[\\s._-]?web(?:[\\s._-]?(?:dl|rip))?\\b)",
+      "assetPath": "network/hbo-max.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-hulu",
+      "groupId": "net",
+      "name": "Hulu",
+      "pattern": "(?i)\\bhulu\\b",
+      "assetPath": "network/hulu.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-pcok",
+      "groupId": "net",
+      "name": "Peacock",
+      "pattern": "(?i)\\bpcok\\b|(?:\\bpeacock)(?=[\\s._-]?web(?:[\\s._-]?(?:dl|rip))?\\b)",
+      "assetPath": "network/peacock.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-pmtp",
+      "groupId": "net",
+      "name": "Paramount+",
+      "pattern": "(?i)\\bpmtp\\b|\\bparamount[\\s._-]?(?:\\+|plus\\b)|(?:\\bparamount)(?=[\\s._-]?web(?:[\\s._-]?(?:dl|rip))?\\b)",
+      "assetPath": "network/paramount-plus.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-crav",
+      "groupId": "net",
+      "name": "Crave",
+      "pattern": "(?i)\\bcrav\\b|(?:\\bcrave)(?=[\\s._-]?web(?:[\\s._-]?(?:dl|rip))?\\b)",
+      "assetPath": "network/crave.svg",
+      "type": "static"
+    },
+    {
+      "id": "p-cr",
+      "groupId": "net",
+      "name": "Crunchyroll",
+      "pattern": "(?i)\\bcrunchy[\\s._-]?roll\\b|(?:\\bcr)(?=[\\s._-]?web(?:[\\s._-]?(?:dl|rip))?\\b)",
+      "assetPath": "network/crunchyroll.svg",
       "type": "static"
     },
     {

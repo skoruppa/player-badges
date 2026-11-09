@@ -33,16 +33,17 @@ const GROUPS = [
   { id: "spc", name: "Special", isExpanded: true },
   { id: "lang", name: "Language", isExpanded: true },
   { id: "rat", name: "Star Rating", isExpanded: true },
+  { id: "net", name: "Networks", isExpanded: true },
 ];
 
 // Default group display order per context
 const GROUP_ORDER = {
-  player: ["res", "hdr", "aud", "ch", "lang", "src", "spc", "rat"],
-  source: ["res", "src", "hdr", "aud", "ch", "spc", "lang", "rat"],
+  player: ["res", "hdr", "aud", "ch", "lang", "src", "spc", "net", "rat"],
+  source: ["res", "src", "hdr", "aud", "ch", "spc", "lang", "net", "rat"],
 };
 
 // Opt-in groups: returned only when requested with g=
-const HIDDEN_GROUPS = ["rat"];
+const HIDDEN_GROUPS = ["rat", "net"];
 
 // Map group -> ordered list of filter IDs (player context)
 const GROUP_FILTERS = {
@@ -53,6 +54,7 @@ const GROUP_FILTERS = {
   src: ["p-remux", "p-bluray", "p-webdl", "p-webrip", "p-hdtv", "p-dvdrip", "p-dvdscr", "p-cam", "p-r5"],
   spc: ["p-imax-e", "p-imax", "p-seadex"],
   rat: ["p-star50", "p-star45", "p-star40", "p-star35", "p-star30", "p-star25", "p-star20", "p-star15", "p-star10", "p-star05"],
+  net: ["p-nflx", "p-amzn", "p-atvp", "p-dsnp", "p-hmax", "p-hulu", "p-pcok", "p-pmtp", "p-crav", "p-cr"],
   lang: [
     "p-eng", "p-pol", "p-spa", "p-fre", "p-ger", "p-ita", "p-por", "p-por-br", "p-rus",
     "p-jpn", "p-kor", "p-zho", "p-hin", "p-tam", "p-tel", "p-mal", "p-ara", "p-tur", "p-dut", "p-swe",
@@ -86,6 +88,8 @@ const PRESETS = {
       'p-dtsx': '#999999', 'p-dtshdma': '#999999', 'p-dtshd': '#888888', 'p-dts': '#888888',
       'p-flac': '#888888', 'p-opus': '#888888', 'p-aac': '#777777', 'p-ac4': '#777777',
       'p-71': '#888888', 'p-61': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
+      'p-nflx': '#e50914', 'p-amzn': '#0779ff', 'p-atvp': '#999999', 'p-dsnp': '#0063e5', 'p-hmax': '#3355ff',
+      'p-hulu': '#1ce783', 'p-pcok': '#8250ff', 'p-pmtp': '#0064ff', 'p-crav': '#29c2f1', 'p-cr': '#ff5e00',
     },
     groupIconColors: { rat: '#ffcc00' },
     borderlessGroups: ['rat']

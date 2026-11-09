@@ -153,7 +153,10 @@
     <!-- Output -->
     <div class="output-panel">
       <div class="output-section">
-        <h2 id="t-url">Badge URL</h2>
+        <div class="section-head">
+          <h2 id="t-url">Badge URL</h2>
+          <button class="guide-open" id="btn-guide" type="button">How to install</button>
+        </div>
         <div class="url-row">
           <input class="url-input" id="url-output" readonly>
           <button class="btn" id="btn-copy-url">Copy URL</button>
@@ -167,9 +170,39 @@
         </div>
         <div class="json-box hidden" id="json-output"></div>
       </div>
+      <section class="output-section install-guide">
+        <h2>Install in Nuvio</h2>
+        <div class="guide-content" id="guide-content">
+          <ol>
+            <li>Pick <em>Player</em> or <em>Source</em> under Context, choose your badges and copy the URL.</li>
+            <li><strong>NuvioTV:</strong> open <span class="settings-path">Settings › Layout › Streams › Fusion badge URLs</span>, scan the QR code with your phone and paste the URL on the page that opens.</li>
+            <li><strong>NuvioMobile:</strong> open <span class="settings-path">Settings › Layout › Streams › Fusion badge URLs</span>, paste the URL and import it.</li>
+          </ol>
+          <h3>Use a separate set for each context</h3>
+          <p>Player and Source badges match different things, so import two URLs:</p>
+          <ul>
+            <li><strong>Source</strong> for the stream list. It reads file and stream names and shows every tag it finds.</li>
+            <li><strong>Player</strong> for the player. It reads what the decoder actually plays (resolution, HDR, audio format, channels, audio language) and uses names only for what a decoder cannot report, like the source or network.</li>
+          </ul>
+          <ol>
+            <li>Import the Player URL first, then the Source URL. The last imported URL becomes active and is used in the stream list. You can switch the active URL later in the same list.</li>
+            <li>Turn on <em>Show in player</em>, open <em>Player badges</em> and pick the Player URL.</li>
+          </ol>
+          <p class="guide-note">Nuvio keeps up to 3 URLs and stores a copy of the badges, so import a URL again after you change it here.</p>
+        </div>
+      </section>
     </div>
   </div>
 </div>
+
+<!-- Install guide overlay (mobile), filled from #guide-content on open -->
+<dialog class="guide-dialog" id="guide-dialog" aria-labelledby="guide-dialog-title">
+  <div class="guide-dialog-head">
+    <h2 id="guide-dialog-title">Install in Nuvio</h2>
+    <button class="guide-close" id="btn-guide-close" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div class="guide-content guide-dialog-body" id="guide-dialog-body"></div>
+</dialog>
 
 <script src="i18n.js"></script>
 <script src="app.js"></script>

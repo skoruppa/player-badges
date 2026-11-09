@@ -41,6 +41,8 @@ const PRESETS = {
       'p-dtsx': '#999999', 'p-dtshdma': '#999999', 'p-dtshd': '#888888', 'p-dts': '#888888',
       'p-flac': '#888888', 'p-opus': '#888888', 'p-aac': '#777777', 'p-ac4': '#777777',
       'p-71': '#888888', 'p-61': '#888888', 'p-51': '#888888', 'p-20': '#777777', 'p-10': '#777777',
+      'p-nflx': '#e50914', 'p-amzn': '#0779ff', 'p-atvp': '#999999', 'p-dsnp': '#0063e5', 'p-hmax': '#3355ff',
+      'p-hulu': '#1ce783', 'p-pcok': '#8250ff', 'p-pmtp': '#0064ff', 'p-crav': '#29c2f1', 'p-cr': '#ff5e00',
     },
     groupIconColors: { rat: '#ffcc00' },
     borderlessGroups: ['rat']
@@ -444,6 +446,19 @@ async function init() {
     document.getElementById('json-output').classList.toggle('hidden');
   });
 
+  // Install guide overlay (mobile): the inline guide is hidden there
+  const guideDialog = document.getElementById('guide-dialog');
+  document.getElementById('btn-guide').addEventListener('click', () => {
+    document.getElementById('guide-dialog-body').innerHTML = document.getElementById('guide-content').innerHTML;
+    if (typeof guideDialog.showModal === 'function') guideDialog.showModal();
+    else guideDialog.setAttribute('open', '');
+  });
+  document.getElementById('btn-guide-close').addEventListener('click', () => guideDialog.close());
+  // A click on the dialog itself, not its content, is a click on the backdrop
+  guideDialog.addEventListener('click', event => {
+    if (event.target === guideDialog) guideDialog.close();
+  });
+
   // Preview collapse toggle (mobile) — default collapsed on small screens
   const previewPanel = document.getElementById('preview-panel');
   document.getElementById('preview-toggle').addEventListener('click', () => {
@@ -722,6 +737,12 @@ function buildSidebar() {
     }
 
     section.appendChild(grid);
+    if (groupId === 'net') {
+      const note = document.createElement('p');
+      note.className = 'group-note';
+      note.textContent = translations.networksNote || I18N.en.networksNote;
+      section.appendChild(note);
+    }
     container.appendChild(section);
   }
 }

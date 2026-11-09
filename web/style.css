@@ -324,6 +324,13 @@ input[type="color"] {
   gap: 5px;
   padding: 4px 20px 12px 36px;
 }
+.group-note {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text2);
+  padding: 0 20px 12px 36px;
+  margin-top: -4px;
+}
 
 /* Badge items */
 .badge-item {
@@ -357,6 +364,87 @@ input[type="color"] {
   letter-spacing: 0.5px;
   margin-bottom: 8px;
 }
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.output-section .section-head h2 { margin-bottom: 0; }
+.guide-open {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 0;
+}
+.install-guide {
+  max-width: 760px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.guide-content { font-size: 13px; line-height: 1.6; }
+.guide-content h3 { font-size: 13px; font-weight: 600; margin: 18px 0 6px; }
+.guide-content p { margin-bottom: 8px; }
+.guide-content ol, .guide-content ul { padding-left: 20px; margin-bottom: 8px; }
+.guide-content li { margin-bottom: 6px; }
+.guide-content li::marker { color: var(--text2); }
+.guide-content em { font-style: normal; font-weight: 600; }
+.settings-path {
+  font-family: monospace;
+  font-size: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+.guide-content .guide-note { color: var(--text2); font-size: 12px; margin-top: 12px; }
+.guide-dialog {
+  width: calc(100% - 24px);
+  max-width: 560px;
+  max-height: calc(100% - 48px);
+  margin: auto;
+  padding: 0;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.guide-dialog[open] { display: flex; flex-direction: column; }
+.guide-dialog::backdrop { background: rgba(0, 0, 0, 0.7); }
+.guide-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.guide-dialog-head h2 { font-size: 15px; font-weight: 600; }
+.guide-close {
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text2);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+.guide-close:hover { color: var(--text); background: var(--surface2); }
+.guide-dialog-body { padding: 16px 20px 20px; overflow-y: auto; }
+.guide-dialog-body .settings-path {
+  white-space: normal;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+body:has(.guide-dialog[open]) { overflow: hidden; }
 .url-row { display: flex; gap: 8px; }
 .url-input {
   flex: 1;
@@ -446,6 +534,7 @@ input[type="color"] {
   .sidebar-header h1 { font-size: 16px; }
   .control-section { padding: 10px 16px; }
   .badge-grid { padding: 4px 16px 10px 28px; }
+  .group-note { padding: 0 16px 10px 28px; }
   .group-drag-handle { display: none; }
   .move-btn { display: inline; }
 
@@ -478,6 +567,8 @@ input[type="color"] {
   .preview-label { cursor: pointer; }
   .output-panel { padding: 12px 16px; }
   .output-section { margin-bottom: 12px; }
+  .install-guide { display: none; }
+  .guide-open { display: inline-block; }
   .json-box { max-height: 150px; }
   .opacity-slider::-webkit-slider-thumb { width: 20px; height: 20px; }
   .opacity-slider::-moz-range-thumb { width: 20px; height: 20px; }

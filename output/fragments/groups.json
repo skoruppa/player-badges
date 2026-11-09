@@ -38,5 +38,10 @@
     "id": "rat",
     "name": "Star Rating",
     "isExpanded": true
+  },
+  {
+    "id": "net",
+    "name": "Networks",
+    "isExpanded": true
   }
 ]
