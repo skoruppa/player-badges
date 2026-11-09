@@ -208,6 +208,12 @@ function applyTranslations(lang) {
   document.getElementById('btn-copy-json').textContent = translations.copyJson;
   document.getElementById('btn-toggle-json').textContent = translations.showHide;
   document.getElementById('btn-guide').textContent = translations.guideButton;
+  document.getElementById('theme-switch').setAttribute('aria-label', translations.theme);
+  for (const [mode, key] of [['system', 'themeSystem'], ['light', 'themeLight'], ['dark', 'themeDark']]) {
+    const button = document.querySelector(`#theme-switch [data-theme-mode="${mode}"]`);
+    button.title = translations[key];
+    button.setAttribute('aria-label', translations[key]);
+  }
   document.getElementById('t-guide-title').textContent = translations.guideTitle;
   document.getElementById('guide-dialog-title').textContent = translations.guideTitle;
   renderGuide(APP_LABELS[lang] || APP_LABELS.en);
@@ -245,9 +251,39 @@ function renderGuide(labels) {
     <p class="guide-note">${t.guideNote}</p>`;
 }
 
+// ── Theme ──────────────────────────────────────────────────────────────────
+
+// 'system' follows prefers-color-scheme; the <head> script applies a saved choice before paint
+const THEME_KEY = 'nuvio-badge-theme';
+
+function applyTheme(mode) {
+  if (mode === 'light' || mode === 'dark') document.documentElement.dataset.theme = mode;
+  else delete document.documentElement.dataset.theme;
+  document.querySelectorAll('#theme-switch button').forEach(button =>
+    button.setAttribute('aria-pressed', String(button.dataset.themeMode === (mode || 'system')))
+  );
+}
+
+function initThemeSwitch() {
+  let saved = null;
+  try { saved = localStorage.getItem(THEME_KEY); } catch {}
+  applyTheme(saved);
+  document.querySelectorAll('#theme-switch button').forEach(button => {
+    button.addEventListener('click', () => {
+      const mode = button.dataset.themeMode;
+      try {
+        if (mode === 'system') localStorage.removeItem(THEME_KEY);
+        else localStorage.setItem(THEME_KEY, mode);
+      } catch {}
+      applyTheme(mode);
+    });
+  });
+}
+
 // ── Init ───────────────────────────────────────────────────────────────────
 
 async function init() {
+  initThemeSwitch();
   const uiLang = detectBrowserLocale();
   applyTranslations(uiLang);
 

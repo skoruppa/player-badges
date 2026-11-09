@@ -3,10 +3,51 @@
   --surface: #141414;
   --surface2: #1e1e1e;
   --border: #2a2a2a;
+  --border-hover: #555;
   --text: #e0e0e0;
   --text2: #888;
   --accent: #4a9eff;
   --accent2: #2d7ad6;
+  --preview-bg: #000;
+  --checker: repeating-conic-gradient(#333 0% 25%, #2a2a2a 0% 50%) 0 0 / 16px 16px;
+  --badge-bg: transparent;
+  --badge-selected-bg: rgba(74, 158, 255, 0.1);
+  color-scheme: dark;
+}
+/* Light theme: follows the system unless the switch picked dark */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f4f4f6;
+    --surface: #ffffff;
+    --surface2: #efeff2;
+    --border: #dcdce1;
+    --border-hover: #aeaeb5;
+    --text: #1b1b1f;
+    --text2: #6a6a72;
+    --accent: #1f74d6;
+    --accent2: #175eb0;
+    --preview-bg: #e6e6ea;
+    /* Badges are white, so their tiles use the dark preview checkerboard */
+    --badge-bg: var(--checker);
+    --badge-selected-bg: linear-gradient(rgba(31, 116, 214, 0.35), rgba(31, 116, 214, 0.35)), var(--checker);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f4f4f6;
+  --surface: #ffffff;
+  --surface2: #efeff2;
+  --border: #dcdce1;
+  --border-hover: #aeaeb5;
+  --text: #1b1b1f;
+  --text2: #6a6a72;
+  --accent: #1f74d6;
+  --accent2: #175eb0;
+  --preview-bg: #e6e6ea;
+  /* Badges are white, so their tiles use the dark preview checkerboard */
+  --badge-bg: var(--checker);
+  --badge-selected-bg: linear-gradient(rgba(31, 116, 214, 0.35), rgba(31, 116, 214, 0.35)), var(--checker);
+  color-scheme: light;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -37,7 +78,7 @@ body {
 /* Preview panel */
 .preview-panel {
   padding: 24px 32px;
-  background: #000;
+  background: var(--preview-bg);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -60,8 +101,7 @@ body {
   align-items: center;
   padding: 12px;
   border-radius: 6px;
-  background:
-    repeating-conic-gradient(#333 0% 25%, #2a2a2a 0% 50%) 0 0 / 16px 16px;
+  background: var(--checker);
 }
 .preview-chip {
   height: 28px;
@@ -91,6 +131,32 @@ body {
 }
 .sidebar-header h1 { font-size: 18px; font-weight: 600; }
 .sidebar-header p { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.header-links { display: flex; align-items: center; gap: 10px; }
+.header-links a { color: var(--text2); display: flex; }
+.header-links a:hover { color: var(--text); }
+/* System / light / dark switch */
+.theme-switch {
+  display: flex;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface2);
+}
+.theme-switch button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 22px;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  color: var(--text2);
+  cursor: pointer;
+}
+.theme-switch button:hover { color: var(--text); }
+.theme-switch button[aria-pressed="true"] { background: var(--surface); color: var(--accent); box-shadow: 0 0 0 1px var(--border); }
+.theme-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 /* Control sections */
 .control-section {
@@ -157,7 +223,7 @@ input[type="color"] {
   cursor: pointer;
   transition: all 0.12s;
 }
-.preset-pill:hover { border-color: #555; color: var(--text); }
+.preset-pill:hover { border-color: var(--border-hover); color: var(--text); }
 .preset-pill.active { border-color: var(--accent); color: var(--accent); background: rgba(74,158,255,0.1); }
 
 .color-controls-disabled { opacity: 0.35; pointer-events: none; }
@@ -179,7 +245,7 @@ input[type="color"] {
 }
 .context-card svg { width: 100%; height: auto; display: block; border-radius: 4px; }
 .context-card span { display: block; font-size: 11px; color: var(--text2); margin-top: 4px; }
-.context-card:hover { border-color: #444; }
+.context-card:hover { border-color: var(--border-hover); }
 .context-card.active {
   border-color: var(--accent);
   background: rgba(74, 158, 255, 0.06);
@@ -364,13 +430,14 @@ input[type="color"] {
   padding: 3px 4px;
   border: 1px solid var(--border);
   border-radius: 5px;
+  background: var(--badge-bg);
   cursor: pointer;
   transition: all 0.12s;
   user-select: none;
 }
 .badge-item.selected {
   border-color: var(--accent);
-  background: rgba(74, 158, 255, 0.1);
+  background: var(--badge-selected-bg);
 }
 .badge-item.dragging { opacity: 0.5; }
 .badge-item img { height: 18px; pointer-events: none; }
