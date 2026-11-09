@@ -195,46 +195,61 @@ SOURCE_PATTERNS = {
 }
 
 # Language filters use locale-dependent SVGs
-# Player context: speaker icon, matches playbackMatchText tokens (space-bounded)
+# Player context: speaker icon, matches the decoder text from playbackMatchText in the apps.
+# It lists the track language code right after the resolution, codec, audio and channel tokens
+# ("1080p ... AAC 2.0 jpn Japanese"), and the name after the code is in the device language.
+# Requiring a decoder token in front keeps title words out when the group falls back to the
+# filename, or when a player set is used for the stream list: "Sousou no Frieren" is not Norwegian.
+_DECODER_TOKEN = (
+    r"(?:[1-9]\.[0-9]|\d{3,4}p|[248]K|UHD|FHD|SD|HEVC|AVC|AV1|VP9|H\.?26[45]|x26[45]"
+    r"|DV|DoVi|Vision|HDR10\+?|HDR|HLG|\d{1,2}bit"
+    r"|DD\+?|DDP|E?AC-?[34]|DTS(?:-HD|:X)?|MA|Atmos|TrueHD|AAC|Opus|FLAC|PCM|ALAC|Vorbis|MP[23])"
+)
+
+
+def _playback_language(codes, tail=""):
+    return rf"(?i)(?:^|\s){_DECODER_TOKEN}\s(?:{codes})(?=\s|$){tail}"
+
+
 LANGUAGE_DEFS = [
-    ("p-eng", "English",    "eng", r"(?i)(?:^| )(en|eng|english)(?= |$)"),
-    ("p-pol", "Polish",     "pol", r"(?i)(?:^| )(pl|pol|polish)(?= |$)"),
-    ("p-spa", "Spanish",    "spa", r"(?i)(?:^| )(es|spa|spanish)(?= |$)"),
-    ("p-fre", "French",     "fra", r"(?i)(?:^| )(fr|fra|fre|french)(?= |$)"),
-    ("p-ger", "German",     "deu", r"(?i)(?:^| )(de|deu|ger|german)(?= |$)"),
-    ("p-ita", "Italian",    "ita", r"(?i)(?:^| )(it|ita|italian)(?= |$)"),
-    ("p-por", "Portuguese", "por", r"(?i)(?:^| )(pt|por|portuguese)(?= |$)(?!.*\bpt-br\b)"),
-    ("p-por-br", "Brazilian",  "por-br", r"(?i)(?:^| )(pt-br|pob|portuguese[\s(]+brazil)"),
-    ("p-rus", "Russian",    "rus", r"(?i)(?:^| )(ru|rus|russian)(?= |$)"),
-    ("p-jpn", "Japanese",   "jpn", r"(?i)(?:^| )(ja|jpn|japanese)(?= |$)"),
-    ("p-kor", "Korean",     "kor", r"(?i)(?:^| )(ko|kor|korean)(?= |$)"),
-    ("p-zho", "Chinese",    "zho", r"(?i)(?:^| )(zh|chi|zho|chinese)(?= |$)"),
-    ("p-hin", "Hindi",      "hin", r"(?i)(?:^| )(hi|hin|hindi)(?= |$)"),
-    ("p-tam", "Tamil",      "tam", r"(?i)(?:^| )(ta|tam|tamil)(?= |$)"),
-    ("p-tel", "Telugu",     "tel", r"(?i)(?:^| )(te|tel|telugu)(?= |$)"),
-    ("p-mal", "Malayalam",  "mal", r"(?i)(?:^| )(ml|mal|malayalam)(?= |$)"),
-    ("p-ara", "Arabic",     "ara", r"(?i)(?:^| )(ar|ara|arabic)(?= |$)"),
-    ("p-tur", "Turkish",    "tur", r"(?i)(?:^| )(tr|tur|turkish)(?= |$)"),
-    ("p-dut", "Dutch",      "nld", r"(?i)(?:^| )(nl|nld|dut|dutch)(?= |$)"),
-    ("p-swe", "Swedish",    "swe", r"(?i)(?:^| )(sv|swe|swedish)(?= |$)"),
-    ("p-nor", "Norwegian",  "nor", r"(?i)(?:^| )(no|nor|norwegian)(?= |$)"),
-    ("p-dan", "Danish",     "dan", r"(?i)(?:^| )(da|dan|danish)(?= |$)"),
-    ("p-fin", "Finnish",    "fin", r"(?i)(?:^| )(fi|fin|finnish)(?= |$)"),
-    ("p-ces", "Czech",      "ces", r"(?i)(?:^| )(cs|ces|cze|czech)(?= |$)"),
-    ("p-hun", "Hungarian",  "hun", r"(?i)(?:^| )(hu|hun|hungarian)(?= |$)"),
-    ("p-ron", "Romanian",   "ron", r"(?i)(?:^| )(ro|ron|rum|romanian)(?= |$)"),
-    ("p-ukr", "Ukrainian",  "ukr", r"(?i)(?:^| )(uk|ukr|ukrainian)(?= |$)"),
-    ("p-ell", "Greek",      "ell", r"(?i)(?:^| )(el|ell|gre|greek)(?= |$)"),
-    ("p-heb", "Hebrew",     "heb", r"(?i)(?:^| )(he|heb|hebrew)(?= |$)"),
-    ("p-tha", "Thai",       "tha", r"(?i)(?:^| )(th|tha|thai)(?= |$)"),
-    ("p-vie", "Vietnamese", "vie", r"(?i)(?:^| )(vi|vie|vietnamese)(?= |$)"),
-    ("p-ind", "Indonesian", "ind", r"(?i)(?:^| )(id|ind|indonesian)(?= |$)"),
-    ("p-msa", "Malay",      "msa", r"(?i)(?:^| )(ms|msa|may|malay)(?= |$)"),
-    ("p-hrv", "Croatian",   "hrv", r"(?i)(?:^| )(hr|hrv|croatian)(?= |$)"),
-    ("p-srp", "Serbian",    "srp", r"(?i)(?:^| )(sr|srp|serbian)(?= |$)"),
-    ("p-bul", "Bulgarian",  "bul", r"(?i)(?:^| )(bg|bul|bulgarian)(?= |$)"),
-    ("p-slk", "Slovak",     "slk", r"(?i)(?:^| )(sk|slk|slo|slovak)(?= |$)"),
-    ("p-slv", "Slovenian",  "slv", r"(?i)(?:^| )(sl|slv|slovenian)(?= |$)"),
+    ("p-eng", "English",    "eng", _playback_language(r"en|eng|english")),
+    ("p-pol", "Polish",     "pol", _playback_language(r"pl|pol|polish")),
+    ("p-spa", "Spanish",    "spa", _playback_language(r"es|spa|spanish")),
+    ("p-fre", "French",     "fra", _playback_language(r"fr|fra|fre|french")),
+    ("p-ger", "German",     "deu", _playback_language(r"de|deu|ger|german")),
+    ("p-ita", "Italian",    "ita", _playback_language(r"it|ita|italian")),
+    ("p-por", "Portuguese", "por", _playback_language(r"pt|por|portuguese", r"(?!.*\bpt-br\b)")),
+    ("p-por-br", "Brazilian",  "por-br", _playback_language(r"pt-br|pob|portuguese[\s(]+brazil")),
+    ("p-rus", "Russian",    "rus", _playback_language(r"ru|rus|russian")),
+    ("p-jpn", "Japanese",   "jpn", _playback_language(r"ja|jpn|japanese")),
+    ("p-kor", "Korean",     "kor", _playback_language(r"ko|kor|korean")),
+    ("p-zho", "Chinese",    "zho", _playback_language(r"zh|chi|zho|chinese")),
+    ("p-hin", "Hindi",      "hin", _playback_language(r"hi|hin|hindi")),
+    ("p-tam", "Tamil",      "tam", _playback_language(r"ta|tam|tamil")),
+    ("p-tel", "Telugu",     "tel", _playback_language(r"te|tel|telugu")),
+    ("p-mal", "Malayalam",  "mal", _playback_language(r"ml|mal|malayalam")),
+    ("p-ara", "Arabic",     "ara", _playback_language(r"ar|ara|arabic")),
+    ("p-tur", "Turkish",    "tur", _playback_language(r"tr|tur|turkish")),
+    ("p-dut", "Dutch",      "nld", _playback_language(r"nl|nld|dut|dutch")),
+    ("p-swe", "Swedish",    "swe", _playback_language(r"sv|swe|swedish")),
+    ("p-nor", "Norwegian",  "nor", _playback_language(r"no|nor|norwegian")),
+    ("p-dan", "Danish",     "dan", _playback_language(r"da|dan|danish")),
+    ("p-fin", "Finnish",    "fin", _playback_language(r"fi|fin|finnish")),
+    ("p-ces", "Czech",      "ces", _playback_language(r"cs|ces|cze|czech")),
+    ("p-hun", "Hungarian",  "hun", _playback_language(r"hu|hun|hungarian")),
+    ("p-ron", "Romanian",   "ron", _playback_language(r"ro|ron|rum|romanian")),
+    ("p-ukr", "Ukrainian",  "ukr", _playback_language(r"uk|ukr|ukrainian")),
+    ("p-ell", "Greek",      "ell", _playback_language(r"el|ell|gre|greek")),
+    ("p-heb", "Hebrew",     "heb", _playback_language(r"he|heb|hebrew")),
+    ("p-tha", "Thai",       "tha", _playback_language(r"th|tha|thai")),
+    ("p-vie", "Vietnamese", "vie", _playback_language(r"vi|vie|vietnamese")),
+    ("p-ind", "Indonesian", "ind", _playback_language(r"id|ind|indonesian")),
+    ("p-msa", "Malay",      "msa", _playback_language(r"ms|msa|may|malay")),
+    ("p-hrv", "Croatian",   "hrv", _playback_language(r"hr|hrv|croatian")),
+    ("p-srp", "Serbian",    "srp", _playback_language(r"sr|srp|serbian")),
+    ("p-bul", "Bulgarian",  "bul", _playback_language(r"bg|bul|bulgarian")),
+    ("p-slk", "Slovak",     "slk", _playback_language(r"sk|slk|slo|slovak")),
+    ("p-slv", "Slovenian",  "slv", _playback_language(r"sl|slv|slovenian")),
 ]
 
 

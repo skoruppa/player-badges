@@ -8,7 +8,7 @@ Vectorized SVG badges for NuvioTV and NuvioMobile. Badges show playback info (re
 ## Two contexts
 
 ### Player context (`p-` prefix)
-Shows what is playing right now. Badges match decoder tokens first; a group with no decoder hit falls back to the filename and stream name, so `pattern` must stay exclusive within a group. Source and Special always come from those names, because the decoder cannot report them. The stream description is not available here. Language badges have speaker icon 🔊 and space-bounded regex (only matches `playbackMatchText` tokens, not filename).
+Shows what is playing right now. Badges match decoder tokens first; a group with no decoder hit falls back to the filename and stream name, so `pattern` must stay exclusive within a group. Source and Special always come from those names, because the decoder cannot report them. The stream description is not available here. Language badges have speaker icon 🔊 and match the track language code only right after a decoder token, as `playbackMatchText` writes it (`1080p ... AAC 2.0 jpn Japanese`), so title words like the `no` in `Sousou no Frieren` never count, even when the group falls back to the filename or a player set is used for the stream list.
 
 ### Source context (`s-` prefix)
 Badges matched against stream filename, name, title and description. Language badges are text-only (no speaker icon) with word-boundary regex + script detection (e.g. `[가-힯]{3,}` for Korean characters in filename).
