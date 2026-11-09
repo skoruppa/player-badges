@@ -207,8 +207,42 @@ function applyTranslations(lang) {
   document.getElementById('btn-copy-url').textContent = translations.copyUrl;
   document.getElementById('btn-copy-json').textContent = translations.copyJson;
   document.getElementById('btn-toggle-json').textContent = translations.showHide;
+  document.getElementById('btn-guide').textContent = translations.guideButton;
+  document.getElementById('t-guide-title').textContent = translations.guideTitle;
+  document.getElementById('guide-dialog-title').textContent = translations.guideTitle;
+  renderGuide(APP_LABELS[lang] || APP_LABELS.en);
   document.title = translations.title;
   document.documentElement.lang = lang;
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+// Install guide: translated text with the settings labels each app shows in this language
+function renderGuide(labels) {
+  const t = translations;
+  const fill = (text, values) => text.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? '');
+  const path = parts => `<span class="settings-path">${parts.map(escapeHtml).join(' › ')}</span>`;
+  // TV and Mobile can word a label differently, then both are shown
+  const label = names => names.map(name => `<em>${escapeHtml(name)}</em>`).join(' / ');
+  document.getElementById('guide-content').innerHTML = `
+    <ol>
+      <li>${fill(t.guideStep1, { context: `<em>${escapeHtml(t.context)}</em>` })}</li>
+      <li>${fill(t.guideStepTv, { path: path(labels.tv) })}</li>
+      <li>${fill(t.guideStepMobile, { path: path(labels.mobile) })}</li>
+    </ol>
+    <h3>${t.guideSetsTitle}</h3>
+    <p>${t.guideSetsIntro}</p>
+    <ul>
+      <li>${t.guideSource}</li>
+      <li>${t.guidePlayer}</li>
+    </ul>
+    <ol>
+      <li>${t.guideOrder}</li>
+      <li>${fill(t.guidePlayerSet, { showInPlayer: label(labels.showInPlayer), playerBadges: label(labels.playerBadges) })}</li>
+    </ol>
+    <p class="guide-note">${t.guideNote}</p>`;
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
@@ -580,6 +614,26 @@ async function loadBadges(forceSelectAll = false) {
 
 // ── Build sidebar ──────────────────────────────────────────────────────────
 
+// (i) icon with a tooltip, shown on hover and on focus so a tap works on touch screens
+function groupInfo(text) {
+  const info = document.createElement('span');
+  info.className = 'group-info';
+  info.tabIndex = 0;
+  info.setAttribute('aria-label', text);
+  info.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">'
+    + '<circle cx="8" cy="8" r="6.75" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+    + '<circle cx="8" cy="5" r="1" fill="currentColor"/>'
+    + '<path d="M8 7.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+  const tip = document.createElement('span');
+  tip.className = 'group-info-tip';
+  tip.setAttribute('role', 'tooltip');
+  tip.textContent = text;
+  info.appendChild(tip);
+  // Keep a click on the icon from reaching the header
+  info.addEventListener('click', event => event.stopPropagation());
+  return info;
+}
+
 function buildSidebar() {
   const container = document.getElementById('groups-container');
   container.innerHTML = '';
@@ -656,6 +710,9 @@ function buildSidebar() {
     });
 
     header.innerHTML = `<span class="group-drag-handle">&#9776;</span><span class="group-name">${group.name}</span>`;
+    if (groupId === 'net') {
+      header.querySelector('.group-name').appendChild(groupInfo(translations.networksNote || I18N.en.networksNote));
+    }
     header.appendChild(moveUp);
     header.appendChild(moveDown);
 
@@ -737,12 +794,6 @@ function buildSidebar() {
     }
 
     section.appendChild(grid);
-    if (groupId === 'net') {
-      const note = document.createElement('p');
-      note.className = 'group-note';
-      note.textContent = translations.networksNote || I18N.en.networksNote;
-      section.appendChild(note);
-    }
     container.appendChild(section);
   }
 }

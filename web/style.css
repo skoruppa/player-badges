@@ -324,13 +324,38 @@ input[type="color"] {
   gap: 5px;
   padding: 4px 20px 12px 36px;
 }
-.group-note {
-  font-size: 11px;
-  line-height: 1.4;
+.group-name { position: relative; }
+.group-info {
+  display: inline-flex;
+  vertical-align: -2px;
+  margin-left: 6px;
   color: var(--text2);
-  padding: 0 20px 12px 36px;
-  margin-top: -4px;
+  cursor: help;
+  outline: none;
+  border-radius: 50%;
 }
+.group-info:hover, .group-info:focus { color: var(--text); }
+.group-info:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+.group-info-tip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  width: 280px;
+  max-width: calc(100vw - 72px);
+  padding: 10px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  cursor: default;
+}
+.group-info:hover .group-info-tip, .group-info:focus .group-info-tip { display: block; }
 
 /* Badge items */
 .badge-item {
@@ -364,23 +389,8 @@ input[type="color"] {
   letter-spacing: 0.5px;
   margin-bottom: 8px;
 }
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.output-section .section-head h2 { margin-bottom: 0; }
-.guide-open {
-  display: none;
-  background: none;
-  border: none;
-  color: var(--accent);
-  font-size: 12px;
-  cursor: pointer;
-  padding: 2px 0;
-}
+/* Mobile only, pushed to the right end of the JSON buttons */
+.guide-open { display: none; margin-left: auto; }
 .install-guide {
   max-width: 760px;
   margin-top: 32px;
@@ -534,7 +544,6 @@ body:has(.guide-dialog[open]) { overflow: hidden; }
   .sidebar-header h1 { font-size: 16px; }
   .control-section { padding: 10px 16px; }
   .badge-grid { padding: 4px 16px 10px 28px; }
-  .group-note { padding: 0 16px 10px 28px; }
   .group-drag-handle { display: none; }
   .move-btn { display: inline; }
 
