@@ -17,6 +17,7 @@ Usage:
 import base64
 import json
 import os
+import re
 import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -253,13 +254,27 @@ LANGUAGE_DEFS = [
 ]
 
 
-def _indian_code(code):
-    """Tam, Tel and Mal are also ordinary words (Tel Aviv), so they count only in capitals
-    or inside a language list ("[Tam + Tel + Hin]")."""
+def _listed_code(code):
+    """A code that is also an ordinary word (Tel Aviv, Sousou no Frieren) counts only in
+    capitals or inside a language list ("[Tam + Tel + Hin]", "ja + en")."""
     return (
-        rf"(?-i:\b{code.upper()}\b)"
-        rf"|(?<=[\[(+,/|]\s?)\b{code}\b|\b{code}\b(?=\s?[\])+,/|])"
+        rf"(?:(?-i:\b{code.upper()}\b)"
+        rf"|(?<=[\[(+,/|]\s?)\b{code}\b|\b{code}\b(?=\s?[\])+,/|]))"
     )
+
+
+# Two-letter codes are everyday words in titles ("Sousou no Frieren", "It Ends With Us",
+# "Casa de Papel", "Da 5 Bloods"), and so are a few three-letter ones ("May December",
+# "Dan Da Dan", "The Rum Diary"), so they go through _listed_code. Names, other codes,
+# flags and scripts still match anywhere.
+_WORD_CODES = {"may", "dan", "fin", "chi", "rum", "spa", "hun", "pol"}
+
+
+def _guard_word_codes(pattern):
+    def guard(match):
+        code = match.group(1)
+        return _listed_code(code) if len(code) == 2 or code in _WORD_CODES else match.group(0)
+    return re.sub(r"\\b([a-z]{2,3})\\b", guard, pattern)
 
 
 # Source context: text-only (no speaker icon), matches filename (word-boundary + script detection + emoji flags)
@@ -277,9 +292,9 @@ SOURCE_LANGUAGE_DEFS = [
     ("s-kor", "Korean",     "kor", r"(?i)\bkorean\b|\bkor\b|\bko\b|[\uAC00-\uD7AF]{3,}|🇰🇷"),
     ("s-zho", "Chinese",    "zho", r"(?i)\bchinese\b|\bchi\b|\bzh\b|[\u4E00-\u9FFF]{3,}|🇨🇳"),
     ("s-hin", "Hindi",      "hin", r"(?i)\bhindi\b|\bhin\b|\bhi\b|[\u0900-\u097F]{3,}|🇮🇳"),
-    ("s-tam", "Tamil",      "tam", rf"(?i)\btamil\b|{_indian_code('tam')}|[\u0B80-\u0BFF]{{3,}}"),
-    ("s-tel", "Telugu",     "tel", rf"(?i)\btelugu\b|{_indian_code('tel')}|[\u0C00-\u0C7F]{{3,}}"),
-    ("s-mal", "Malayalam",  "mal", rf"(?i)\bmalayalam\b|{_indian_code('mal')}|[\u0D00-\u0D7F]{{3,}}"),
+    ("s-tam", "Tamil",      "tam", rf"(?i)\btamil\b|{_listed_code('tam')}|[\u0B80-\u0BFF]{{3,}}"),
+    ("s-tel", "Telugu",     "tel", rf"(?i)\btelugu\b|{_listed_code('tel')}|[\u0C00-\u0C7F]{{3,}}"),
+    ("s-mal", "Malayalam",  "mal", rf"(?i)\bmalayalam\b|{_listed_code('mal')}|[\u0D00-\u0D7F]{{3,}}"),
     ("s-ara", "Arabic",     "ara", r"(?i)\barabic\b|\bara\b|\bar\b|[\u0600-\u06FF]{3,}|🇸🇦"),
     ("s-tur", "Turkish",    "tur", r"(?i)\bturkish\b|\btur\b|\btr\b|🇹🇷"),
     ("s-dut", "Dutch",      "nld", r"(?i)\bdutch\b|\bnld\b|\bnl\b|🇳🇱"),
@@ -303,6 +318,7 @@ SOURCE_LANGUAGE_DEFS = [
     ("s-slk", "Slovak",     "slk", r"(?i)\bslovak\b|\bslk\b|\bslo\b|\bsk\b|🇸🇰"),
     ("s-slv", "Slovenian",  "slv", r"(?i)\bslovenian\b|\bslv\b|\bsl\b|🇸🇮"),
 ]
+SOURCE_LANGUAGE_DEFS = [(sid, name, iso3, _guard_word_codes(p)) for sid, name, iso3, p in SOURCE_LANGUAGE_DEFS]
 
 # AIOStreams formatters print language codes through ::smallcaps ("ᴊᴀ · ᴇɴ"), which plain regexes
 # cannot see. Subtitle codes share the format but sit in brackets, so those are skipped.

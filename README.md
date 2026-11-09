@@ -208,5 +208,6 @@ Nothing keeps these lists in sync, so update each one:
 - `pt` (Portugal) and `pt-br` (Brazil) UI locales have distinct translations: Polaco/Polonês, Checo/Tcheco
 - Source language regex also matches AIOStreams `::smallcaps` codes (`ᴊᴀ · ᴇɴ`), skipping subtitle codes in brackets
 - Source language regex includes emoji flag matching (🇵🇱, 🇬🇧, 🇧🇷, etc.) and script detection (CJK, Cyrillic, Arabic)
+- Source two-letter codes, plus `may`, `dan`, `fin`, `chi`, `rum`, `spa`, `hun`, `pol`, are everyday words in titles, so they count only in capitals (`NO`, `IT`) or inside a language list (`[ja + en]`); an all-caps title like `IT (2017)` still reads as Italian
 - Non-Latin scripts use Noto Sans fallback (Arabic, Hebrew, CJK, Devanagari, Bengali, Tamil, Telugu, Malayalam, Thai, Greek), shaped with HarfBuzz
 - ISO locale uses 3-letter codes (ENG, POL, SPA)
